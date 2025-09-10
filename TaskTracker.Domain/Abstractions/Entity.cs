@@ -2,12 +2,6 @@
 {
     public abstract class Entity
     {
-        private int _id;
-
-        public virtual int Id
-        {
-            get => _id;
-            protected set => _id = value;
-        }
+        public virtual int Id { get; protected set; }
     }
 }
