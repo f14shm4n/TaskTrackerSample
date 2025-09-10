@@ -34,5 +34,10 @@ namespace TaskTracker.Infrastructure.Repositories
         {
             return await _context.Tasks.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
+
+        public async Task<bool> ContainsTaskAsync(int id, CancellationToken cancellationToken)
+        {
+            return await _context.Tasks.AnyAsync(x => x.Id == id, cancellationToken);
+        }
     }
 }

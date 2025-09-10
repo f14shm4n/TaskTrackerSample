@@ -76,5 +76,19 @@ namespace TaskTracker.API.Controllers
         {
             return await _mediator.Send(command);
         }
+
+        [HttpPut("add-sub-task")]
+        [ProducesResponseType(typeof(AddSubTaskCommandResponse), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<AddSubTaskCommandResponse>> AddSubTask([FromBody] AddSubTaskCommand command)
+        {
+            return await _mediator.Send(command);
+        }
+
+        [HttpPut("clear-master-task")]
+        [ProducesResponseType(typeof(ClearMasterTaskCommandResponse), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<ClearMasterTaskCommandResponse>> ClearMasterTask([FromBody] ClearMasterTaskCommand command)
+        {
+            return await _mediator.Send(command);
+        }
     }
 }

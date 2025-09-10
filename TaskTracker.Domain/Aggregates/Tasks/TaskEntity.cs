@@ -57,5 +57,19 @@ namespace TaskTracker.Domain.Aggregates.Tasks
         }
 
         public void ClearWorker() => Worker = null;
+
+        public void SetMasterTask(int masterTaskId)
+        {
+            if (masterTaskId <= 0)
+            {
+                return;
+            }
+            MasterTaskId = masterTaskId;
+        }
+
+        public void RemoveMasterTask()
+        {
+            MasterTaskId = null;
+        }
     }
 }

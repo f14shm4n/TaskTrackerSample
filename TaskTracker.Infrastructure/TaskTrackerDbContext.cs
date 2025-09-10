@@ -34,7 +34,6 @@ namespace TaskTracker.Infrastructure
                 .HasForeignKey(t => t.MasterTaskId)
                 .IsRequired(false);
 
-
                 x.ToTable("tasks");
             });
 
