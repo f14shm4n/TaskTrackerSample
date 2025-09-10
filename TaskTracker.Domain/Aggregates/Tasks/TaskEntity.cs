@@ -5,16 +5,16 @@ namespace TaskTracker.Domain.Aggregates.Tasks
     public class TaskEntity : Entity, IAggregateRoot
     {
         private readonly List<TaskEntity> _subTasks = [];
-        //private readonly List<TaskRelationship> _relatedTasks = [];
+        private readonly List<TaskRelationship> _outRelations = [];
+        private readonly List<TaskRelationship> _inRelations = [];
 
         protected TaskEntity()
         {
         }
 
-        public TaskEntity(string? title, string? description, TaskEntityStatus status, TaskEntityPriority priority, string author, string? worker = null)
+        public TaskEntity(string? title, TaskEntityStatus status, TaskEntityPriority priority, string author, string? worker = null)
         {
             Title = title;
-            Description = description;
             Status = status;
             Priority = priority;
             Author = author;
@@ -22,14 +22,40 @@ namespace TaskTracker.Domain.Aggregates.Tasks
         }
 
         public string? Title { get; private set; }
-        public string? Description { get; private set; } // TODO: Remove on final
         public TaskEntityStatus Status { get; private set; }
         public TaskEntityPriority Priority { get; private set; }
-        public string Author { get; private set; } = string.Empty;// Simplificated field
-        public string? Worker { get; private set; }// Simplificated field
+        public string Author { get; private set; } = string.Empty; // Simplificated field
+        public string? Worker { get; private set; } // Simplificated field
         public int? MasterTaskId { get; private set; }
         public TaskEntity? MasterTask { get; private set; }
         public IReadOnlyCollection<TaskEntity> SubTasks => _subTasks;
-        //public IReadOnlyCollection<TaskRelationship> RelatedTasks => _relatedTasks;
+        public IReadOnlyCollection<TaskRelationship> OutRelations => _outRelations;
+        public IReadOnlyCollection<TaskRelationship> InRelations => _inRelations;
+
+        public void SetStatus(TaskEntityStatus status) => Status = status;
+
+        public void SetPriority(TaskEntityPriority priority) => Priority = priority;
+
+        public void SetAuthor(string author)
+        {
+            if (author is null || author.Length == 0)
+            {
+                // May be should throw error
+                return;
+            }
+
+            Author = author;
+        }
+
+        public void SetWorker(string worker)
+        {
+            if (worker is null || worker.Length == 0)
+            {
+                return;
+            }
+            Worker = worker;
+        }
+
+        public void ClearWorker() => Worker = null;
     }
 }
