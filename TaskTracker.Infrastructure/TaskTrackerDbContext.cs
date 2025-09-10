@@ -25,12 +25,15 @@ namespace TaskTracker.Infrastructure
             {
                 x.HasKey(x => x.Id);
 
-                x.Property(x => x.Author).IsRequired();
+                x.Property(a => a.Author)
+                .IsRequired()
+                .HasMaxLength(20);
 
-                x.HasOne(x => x.MasterTask)
-                .WithMany(x => x.SubTasks)
-                .HasForeignKey(x => x.MasterTaskId)
+                x.HasOne(t => t.MasterTask)
+                .WithMany(t => t.SubTasks)
+                .HasForeignKey(t => t.MasterTaskId)
                 .IsRequired(false);
+
 
                 x.ToTable("tasks");
             });
@@ -39,25 +42,25 @@ namespace TaskTracker.Infrastructure
             {
                 x.HasKey(x => x.Id);
 
-                x.HasMany(x => x.Relationships)
-                .WithOne(x => x.Relation)
-                .HasForeignKey(x => x.RelationId);
-
                 x.ToTable("task_relations");
             });
 
             builder.Entity<TaskRelationship>(x =>
             {
-                x.HasKey(x => new { x.RelationId, x.LeftTaskId, x.RightTaskId });
+                x.HasKey(x => new { x.RelationId, x.SourceTaskId, x.TargetTaskId });
 
-                x.HasOne(x => x.LeftTask)
-                .WithMany()
-                .HasForeignKey(x => x.LeftTaskId)
+                x.HasOne(rel => rel.Relation)
+                .WithMany(trel => trel.Relationships)
+                .HasForeignKey(rel => rel.RelationId);
+
+                x.HasOne(rel => rel.SourceTask)
+                .WithMany(t => t.OutRelations)
+                .HasForeignKey(rel => rel.SourceTaskId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-                x.HasOne(x => x.RightTask)
-                .WithMany()
-                .HasForeignKey(x => x.RightTaskId)
+                x.HasOne(rel => rel.TargetTask)
+                .WithMany(t => t.InRelations)
+                .HasForeignKey(rel => rel.TargetTaskId)
                 .OnDelete(DeleteBehavior.NoAction);
 
                 x.ToTable("task_relationships");

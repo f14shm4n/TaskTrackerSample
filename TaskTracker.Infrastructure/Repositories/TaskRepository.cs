@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,9 +25,14 @@ namespace TaskTracker.Infrastructure.Repositories
             return _context.Tasks.Add(task).Entity;
         }
 
-        public TaskEntity Get(int id)
+        public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return (await _context.Tasks.Where(x => x.Id == id).ExecuteDeleteAsync(cancellationToken)) > 0;
+        }
+
+        public async Task<TaskEntity?> GetAsync(int id, CancellationToken cancellationToken)
+        {
+            return await _context.Tasks.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
     }
 }

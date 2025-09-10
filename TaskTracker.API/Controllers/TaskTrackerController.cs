@@ -22,6 +22,7 @@ namespace TaskTracker.API.Controllers
         }
 
         [HttpPost("create-task")]
+        [ProducesResponseType(typeof(CreateTaskCommandResponse), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<CreateTaskCommandResponse>> CreateTask([FromBody] CreateTaskCommand command)
         {
             return await _mediator.Send(command);
@@ -38,6 +39,42 @@ namespace TaskTracker.API.Controllers
                 return dto;
             }
             return NotFound();
+        }
+
+        [HttpDelete("delete-task")]
+        [ProducesResponseType(typeof(DeleteTaskCommandResponse), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<DeleteTaskCommandResponse>> DeleteTask([FromQuery] DeleteTaskCommand command)
+        {
+            return await _mediator.Send(command);
+        }
+
+        [HttpPut("update-task-status")]
+        [ProducesResponseType(typeof(UpdateTaskStatusCommandResponse), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<UpdateTaskStatusCommandResponse>> UpdateTaskStatus([FromBody] UpdateTaskStatusCommand command)
+        {
+            return await _mediator.Send(command);
+        }
+
+        [HttpPut("update-task-priority")]
+        [ProducesResponseType(typeof(UpdateTaskPriorityCommandResponse), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<UpdateTaskPriorityCommandResponse>> UpdateTaskPriority([FromBody] UpdateTaskPriorityCommand command)
+        {
+            return await _mediator.Send(command);
+        }
+
+        [HttpPut("update-task-author")]
+        [ProducesResponseType(typeof(UpdateTaskAuthorCommandResponse), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<UpdateTaskAuthorCommandResponse>> UpdateTaskAuthor([FromBody] UpdateTaskAuthorCommand command)
+        {
+            return await _mediator.Send(command);
+        }
+
+
+        [HttpPut("update-task-worker")]
+        [ProducesResponseType(typeof(UpdateTaskWorkerCommandResponse), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<UpdateTaskWorkerCommandResponse>> UpdateTaskWorker([FromBody] UpdateTaskWorkerCommand command)
+        {
+            return await _mediator.Send(command);
         }
     }
 }

@@ -10,7 +10,7 @@ namespace TaskTracker.API.Application.Extensions
     {
         public static TaskEntity ToTaskEntity(this CreateTaskCommand request)
         {
-            return new TaskEntity(request.Title, request.Description, request.Status, request.Priority, request.Author, request.Worker);
+            return new TaskEntity(request.Title, request.Status, request.Priority, request.Author, request.Worker);
         }
 
         public static TaskDTO ToTaskDto(this TaskEntity task)
@@ -19,7 +19,6 @@ namespace TaskTracker.API.Application.Extensions
             {
                 Id = task.Id,
                 Title = task.Title,
-                Description = task.Description,
                 Status = task.Status,
                 Priority = task.Priority,
                 Author = task.Author,
