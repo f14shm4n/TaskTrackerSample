@@ -19,8 +19,8 @@ namespace TaskTracker.API.Application.Commands
 
         [Required]
         public string Author { get; set; } = string.Empty;
-        public string? Worker { get; set; }               
+        public string? Worker { get; set; }
     }
 
-    public record CreateTaskCommandResponse(int Id);
+    public record CreateTaskCommandResponse(int TaskId) : ApiResponseBase(TaskId > 0);
 }
