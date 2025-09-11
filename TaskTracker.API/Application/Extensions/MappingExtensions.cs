@@ -2,27 +2,27 @@
 using System.Threading.Tasks;
 using TaskTracker.API.Application.Commands;
 using TaskTracker.API.Application.Dto;
-using TaskTracker.Domain.Aggregates.Tasks;
+using TaskTracker.Domain.Aggregates.WorkAssignment;
 
 namespace TaskTracker.API.Application.Extensions
 {
     public static class MappingExtensions
     {
-        public static TaskEntity ToTaskEntity(this CreateTaskCommand request)
+        public static WorkAssignment ToWorkAssignment(this CreateWorkAssignmentCommand request)
         {
-            return new TaskEntity(request.Title, request.Status, request.Priority, request.Author, request.Worker);
+            return new WorkAssignment(request.Title, request.Status, request.Priority, request.Author, request.Worker);
         }
 
-        public static TaskDTO ToTaskDto(this TaskEntity task)
+        public static WorkAssignmentDTO ToWorkAssignmentDto(this WorkAssignment workAssignment)
         {
-            return new TaskDTO
+            return new WorkAssignmentDTO
             {
-                Id = task.Id,
-                Title = task.Title,
-                Status = task.Status,
-                Priority = task.Priority,
-                Author = task.Author,
-                Worker = task.Worker,
+                Id = workAssignment.Id,
+                Title = workAssignment.Title,
+                Status = workAssignment.Status,
+                Priority = workAssignment.Priority,
+                Author = workAssignment.Author,
+                Worker = workAssignment.Worker,
             };
         }
     }

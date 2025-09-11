@@ -22,16 +22,16 @@ namespace TaskTracker.API.Controllers
         }
 
         [HttpPost("create-task")]
-        [ProducesResponseType(typeof(CreateTaskCommandResponse), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<CreateTaskCommandResponse>> CreateTask([FromBody] CreateTaskCommand command)
+        [ProducesResponseType(typeof(CreateWorkAssignmentCommandResponse), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<CreateWorkAssignmentCommandResponse>> CreateTask([FromBody] CreateWorkAssignmentCommand command)
         {
             return await _mediator.Send(command);
         }
 
         [HttpGet("get-task")]
-        [ProducesResponseType(typeof(TaskDTO), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(WorkAssignmentDTO), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<TaskDTO>> GetTask([FromQuery] GetTaskByIdQuery query)
+        public async Task<ActionResult<WorkAssignmentDTO>> GetTask([FromQuery] GetTaskByIdQuery query)
         {
             var dto = await _mediator.Send(query);
             if (dto != null)
@@ -42,51 +42,51 @@ namespace TaskTracker.API.Controllers
         }
 
         [HttpDelete("delete-task")]
-        [ProducesResponseType(typeof(DeleteTaskCommandResponse), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<DeleteTaskCommandResponse>> DeleteTask([FromQuery] DeleteTaskCommand command)
+        [ProducesResponseType(typeof(DeleteWorkAssignmentCommandResponse), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<DeleteWorkAssignmentCommandResponse>> DeleteTask([FromQuery] DeleteWorkAssignmentCommand command)
         {
             return await _mediator.Send(command);
         }
 
         [HttpPut("update-task-status")]
-        [ProducesResponseType(typeof(UpdateTaskStatusCommandResponse), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<UpdateTaskStatusCommandResponse>> UpdateTaskStatus([FromBody] UpdateTaskStatusCommand command)
+        [ProducesResponseType(typeof(UpdateWorkAssignmentStatusCommandResponse), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<UpdateWorkAssignmentStatusCommandResponse>> UpdateTaskStatus([FromBody] UpdateWorkAssignmentStatusCommand command)
         {
             return await _mediator.Send(command);
         }
 
         [HttpPut("update-task-priority")]
-        [ProducesResponseType(typeof(UpdateTaskPriorityCommandResponse), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<UpdateTaskPriorityCommandResponse>> UpdateTaskPriority([FromBody] UpdateTaskPriorityCommand command)
+        [ProducesResponseType(typeof(UpdateWorkAssignmentPriorityCommandResponse), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<UpdateWorkAssignmentPriorityCommandResponse>> UpdateTaskPriority([FromBody] UpdateWorkAssignmentPriorityCommand command)
         {
             return await _mediator.Send(command);
         }
 
         [HttpPut("update-task-author")]
-        [ProducesResponseType(typeof(UpdateTaskAuthorCommandResponse), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<UpdateTaskAuthorCommandResponse>> UpdateTaskAuthor([FromBody] UpdateTaskAuthorCommand command)
+        [ProducesResponseType(typeof(UpdateWorkAssignmentAuthorCommandResponse), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<UpdateWorkAssignmentAuthorCommandResponse>> UpdateTaskAuthor([FromBody] UpdateWorkAssignmentAuthorCommand command)
         {
             return await _mediator.Send(command);
         }
 
 
         [HttpPut("update-task-worker")]
-        [ProducesResponseType(typeof(UpdateTaskWorkerCommandResponse), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<UpdateTaskWorkerCommandResponse>> UpdateTaskWorker([FromBody] UpdateTaskWorkerCommand command)
+        [ProducesResponseType(typeof(UpdateWorkAssignmentWorkerCommandResponse), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<UpdateWorkAssignmentWorkerCommandResponse>> UpdateTaskWorker([FromBody] UpdateWorkAssignmentWorkerCommand command)
         {
             return await _mediator.Send(command);
         }
 
         [HttpPut("add-sub-task")]
-        [ProducesResponseType(typeof(AddSubTaskCommandResponse), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<AddSubTaskCommandResponse>> AddSubTask([FromBody] AddSubTaskCommand command)
+        [ProducesResponseType(typeof(AddSubWorkAssignmentCommandResponse), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<AddSubWorkAssignmentCommandResponse>> AddSubTask([FromBody] AddSubWorkAssignmentCommand command)
         {
             return await _mediator.Send(command);
         }
 
         [HttpPut("clear-master-task")]
-        [ProducesResponseType(typeof(ClearMasterTaskCommandResponse), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<ClearMasterTaskCommandResponse>> ClearMasterTask([FromBody] ClearMasterTaskCommand command)
+        [ProducesResponseType(typeof(ClearHeadWorkAssignmentCommandResponse), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<ClearHeadWorkAssignmentCommandResponse>> ClearMasterTask([FromBody] ClearHeadWorkAssignmentCommand command)
         {
             return await _mediator.Send(command);
         }

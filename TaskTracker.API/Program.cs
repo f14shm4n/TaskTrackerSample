@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using System.Text.Json.Serialization;
-using TaskTracker.Domain.Aggregates.Tasks;
+using TaskTracker.Domain.Aggregates.WorkAssignment;
 using TaskTracker.Infrastructure;
 using TaskTracker.Infrastructure.Repositories;
 
@@ -60,7 +60,7 @@ namespace TaskTracker.API
                 c.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
             });
 
-            builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+            builder.Services.AddScoped<IWorkAssignmentRepository, WorkAssignmentRepository>();
         }
 
         private static void SetupDatabase(WebApplication app)
