@@ -7,12 +7,12 @@ namespace TaskTracker.API.Application.Commands
     public class UpdateWorkAssignmentStatusCommand : IRequest<UpdateWorkAssignmentStatusCommandResponse>
     {
         /// <summary>
-        /// The identifier of the task for which the status needs to be changed.
+        /// Идентификатор задачи.
         /// </summary>
         [Required]
         public int Id { get; set; }
         /// <summary>
-        /// The new task status that needs to be assigned.
+        /// Новый статус задачи.
         /// </summary>
         [Required]
         public WorkAssignmentStatus NewStatus { get; set; }

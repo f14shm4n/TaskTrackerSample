@@ -6,12 +6,12 @@ namespace TaskTracker.API.Application.Commands
     public class UpdateWorkAssignmentWorkerCommand : IRequest<UpdateWorkAssignmentWorkerCommandResponse>
     {
         /// <summary>
-        /// The identifier of the task for which the assignee needs to be set.
+        /// Идентификатор задачи.
         /// </summary>
         [Required]
         public int Id { get; set; }
         /// <summary>
-        /// The name of the task assignee that needs to be set.
+        /// Новое имя исполнителя.
         /// </summary>
         public string? NewWorker { get; set; }
     }

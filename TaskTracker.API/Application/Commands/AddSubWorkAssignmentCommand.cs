@@ -6,12 +6,12 @@ namespace TaskTracker.API.Application.Commands
     public class AddSubWorkAssignmentCommand : IRequest<AddSubWorkAssignmentCommandResponse>
     {
         /// <summary>
-        /// The identifier of the task for which a subtask needs to be set.
+        /// Идентификатор задачи к которой необходимо прикрепить подзадачу.
         /// </summary>
         [Required]
         public int WorkAssignmentId { get; set; }
         /// <summary>
-        /// The identifier of the task that needs to be set as a subtask.
+        /// Идентификатор подзадачи.
         /// </summary>
         [Required]
         public int SubWorkAssignmentId { get; set; }

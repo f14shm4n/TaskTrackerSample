@@ -7,12 +7,12 @@ namespace TaskTracker.API.Application.Commands
     public class UpdateWorkAssignmentPriorityCommand : IRequest<UpdateWorkAssignmentPriorityCommandResponse>
     {
         /// <summary>
-        /// The identifier of the task for which the priority needs to be changed.
+        /// Идентификатор задачи.
         /// </summary>
         [Required]
         public int Id { get; set; }
         /// <summary>
-        /// The new priority that needs to be set.
+        /// Новый приоритет задачи.
         /// </summary>
         [Required]
         public WorkAssignmentPriority NewPriority { get; set; }

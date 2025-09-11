@@ -6,12 +6,12 @@ namespace TaskTracker.API.Application.Commands
     public class UpdateWorkAssignmentAuthorCommand : IRequest<UpdateWorkAssignmentAuthorCommandResponse>
     {
         /// <summary>
-        /// The identifier of the task for which the author needs to be changed.
+        /// Идентификатор задачи.
         /// </summary>
         [Required]
         public int Id { get; set; }
         /// <summary>
-        /// The new author name that needs to be set.
+        /// Новое имя автора.
         /// </summary>
         [Required]
         public string NewAuthor { get; set; } = null!;
