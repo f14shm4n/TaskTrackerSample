@@ -4,17 +4,16 @@
     {
         protected WorkAssignmentRelationship() { }
 
-        public WorkAssignmentRelationship(int relationId, int sourceWorkAssignmentId, int targetWorkAssignmentId)
+        public WorkAssignmentRelationship(WorkAssignmentRelationType relation, int sourceWorkAssignmentId, int targetWorkAssignmentId)
         {
-            RelationId = relationId;
+            Relation = relation;
             SourceWorkAssignmentId = sourceWorkAssignmentId;
             TargetWorkAssignmentId = targetWorkAssignmentId;
         }
 
-        public int RelationId { get; private set; }
+        public WorkAssignmentRelationType Relation { get; private set; }
         public int SourceWorkAssignmentId { get; private set; }
         public int TargetWorkAssignmentId { get; private set; }
-        public WorkAssignmentRelation? Relation { get; private set; }
         public WorkAssignment? SourceWorkAssignment { get; private set; }
         public WorkAssignment? TargetWorkAssignment { get; private set; }
     }

@@ -16,7 +16,6 @@ namespace TaskTracker.Infrastructure
         }
 
         public DbSet<WorkAssignment> WorkAssignments { get; set; }
-        public DbSet<WorkAssignmentRelation> WorkAssignmentRelations { get; set; }
         public DbSet<WorkAssignmentRelationship> WorkAssignmentRelationships { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -37,23 +36,12 @@ namespace TaskTracker.Infrastructure
                 x.ToTable("work_assignments");
             });
 
-            builder.Entity<WorkAssignmentRelation>(x =>
-            {
-                x.HasKey(x => x.Id);
-
-                x.ToTable("work_assignments_relations");
-            });
-
             builder.Entity<WorkAssignmentRelationship>(x =>
             {
-                x.HasKey(x => new { x.RelationId, x.SourceWorkAssignmentId, x.TargetWorkAssignmentId });
+                x.HasKey(x => new { x.Relation, x.SourceWorkAssignmentId, x.TargetWorkAssignmentId });
 
-                x.HasIndex(x => new { x.RelationId, x.SourceWorkAssignmentId, x.TargetWorkAssignmentId })
+                x.HasIndex(x => new { x.Relation, x.SourceWorkAssignmentId, x.TargetWorkAssignmentId })
                 .IsUnique();
-
-                x.HasOne(rel => rel.Relation)
-                .WithMany(trel => trel.Relationships)
-                .HasForeignKey(rel => rel.RelationId);
 
                 x.HasOne(rel => rel.SourceWorkAssignment)
                 .WithMany(t => t.OutRelations)
