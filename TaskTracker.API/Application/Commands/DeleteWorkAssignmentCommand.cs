@@ -7,6 +7,8 @@ namespace TaskTracker.API.Application.Commands
     {
         [Required]
         public int Id { get; set; }
+
+        public bool ReleaseSubTasks { get; set; } = true;
     }
 
     public record DeleteWorkAssignmentCommandResponse(bool Success) : ApiResponseBase(Success);

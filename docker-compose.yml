@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mssql_container
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrongPassword!
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  task_tracker_api_app:
+    build:
+      context: .
+      dockerfile: TaskTracker.API/Dockerfile
+    container_name: task_tracker_api
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=task_tracker;User Id=sa;Password=YourStrongPassword!;TrustServerCertificate=true;
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "5000:80"
+      - "8080:8080"
+    depends_on:
+      - sqlserver
+    networks:
+      - app-network
+    restart: unless-stopped
+
+volumes:
+  sqlserver_data:
+
+networks:
+  app-network:
+    driver: bridge

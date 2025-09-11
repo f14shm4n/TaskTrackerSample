@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,11 +12,13 @@ namespace TaskTracker.Infrastructure.Repositories
 {
     public sealed class WorkAssignmentRepository : IWorkAssignmentRepository
     {
+        private readonly ILogger<WorkAssignmentRepository> _logger;
         private readonly TaskTrackerDbContext _context;
 
-        public WorkAssignmentRepository(TaskTrackerDbContext context)
+        public WorkAssignmentRepository(TaskTrackerDbContext context, ILogger<WorkAssignmentRepository> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public IUnitOfWork UnitOfWork => _context;
@@ -25,9 +28,35 @@ namespace TaskTracker.Infrastructure.Repositories
             return _context.WorkAssignments.Add(workAssignment).Entity;
         }
 
-        public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken)
+        public async Task<bool> DeleteAsync(int id, bool releaseSubTasks, CancellationToken cancellationToken)
         {
-            return (await _context.WorkAssignments.Where(x => x.Id == id).ExecuteDeleteAsync(cancellationToken)) > 0;
+            int rCount = 0;
+            await using (var transaction = await _context.Database.BeginTransactionAsync(cancellationToken))
+            {
+                try
+                {
+                    await _context.WorkAssignmentRelationships
+                        .Where(x => x.SourceWorkAssignmentId == id || x.TargetWorkAssignmentId == id)
+                        .ExecuteDeleteAsync(cancellationToken);
+
+                    if (releaseSubTasks)
+                    {
+                        await _context.WorkAssignments
+                            .Where(x => x.HeadAssignemtId == id)
+                            .ExecuteUpdateAsync(setters => setters.SetProperty(x => x.HeadAssignemtId, (int?)null));
+                    }
+
+                    rCount = await _context.WorkAssignments.Where(x => x.Id == id).ExecuteDeleteAsync(cancellationToken);
+
+                    await transaction.CommitAsync(cancellationToken);
+                }
+                catch (Exception)
+                {
+                    await transaction.RollbackAsync(cancellationToken);
+                    throw;
+                }
+            }
+            return rCount > 0;
         }
 
         public Task<WorkAssignment?> GetAsync(int id, CancellationToken cancellationToken)

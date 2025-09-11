@@ -2,6 +2,7 @@ using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc.Testing;
 using System;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TaskTracker.API.Application.Commands;
@@ -26,7 +27,8 @@ namespace TaskTracker.API.Tests
         [Fact]
         public async Task CreateWorkAssignment()
         {
-            var client = _factory.CreateClient();
+            var client = await CreateClientWithJwt();
+
             await DoWorkAsync(async sp =>
             {
                 var rsp = await client.PostAsJsonAsync("/TaskTracker/create-task", GetCreateTaskCommand());
@@ -41,7 +43,7 @@ namespace TaskTracker.API.Tests
         [Fact]
         public async Task DeleteWorkAssignment()
         {
-            var client = _factory.CreateClient();
+            var client = await CreateClientWithJwt();
 
             await DoWorkAsync(async sp =>
             {
@@ -58,7 +60,7 @@ namespace TaskTracker.API.Tests
         [Fact]
         public async Task UpdateWorkAssignmentStatus()
         {
-            var client = _factory.CreateClient();
+            var client = await CreateClientWithJwt();
 
             await DoWorkAsync(async sp =>
             {
@@ -77,7 +79,7 @@ namespace TaskTracker.API.Tests
         [Fact]
         public async Task UpdateWorkAssignmentPriority()
         {
-            var client = _factory.CreateClient();
+            var client = await CreateClientWithJwt();
 
             await DoWorkAsync(async sp =>
             {
@@ -96,7 +98,7 @@ namespace TaskTracker.API.Tests
         [Fact]
         public async Task UpdateWorkAssignmentAuthor()
         {
-            var client = _factory.CreateClient();
+            var client = await CreateClientWithJwt();
 
             await DoWorkAsync(async sp =>
             {
@@ -121,7 +123,7 @@ namespace TaskTracker.API.Tests
         [InlineData("Vasya", null)]
         public async Task UpdateWorkAssignmentWorker(string? oldWorker, string? newWorker)
         {
-            var client = _factory.CreateClient();
+            var client = await CreateClientWithJwt();
 
             await DoWorkAsync(async sp =>
             {
@@ -140,7 +142,7 @@ namespace TaskTracker.API.Tests
         [Fact]
         public async Task AddSubWorkAssignment()
         {
-            var client = _factory.CreateClient();
+            var client = await CreateClientWithJwt();
 
             await DoWorkAsync(async sp =>
             {
@@ -161,7 +163,7 @@ namespace TaskTracker.API.Tests
         [Fact]
         public async Task ClearHeadWorkAssignment()
         {
-            var client = _factory.CreateClient();
+            var client = await CreateClientWithJwt();
 
             await DoWorkAsync(async sp =>
             {
@@ -183,7 +185,7 @@ namespace TaskTracker.API.Tests
         [Fact]
         public async Task SetRelation()
         {
-            var client = _factory.CreateClient();
+            var client = await CreateClientWithJwt();
 
             await DoWorkAsync(async sp =>
             {
@@ -195,8 +197,7 @@ namespace TaskTracker.API.Tests
                 var data = await rsp.Content.ReadFromJsonAsync<AddWorkAssignmentRelationCommandResponse>();
                 data.Should().NotBeNull();
                 data.Success.Should().BeTrue();
-
-                await mediator.Send(new RemoveWorkAssignmentRelationCommand { Relation = WorkAssignmentRelationType.RelativeTo, SourceId = taskData1.Id, TargetId = taskData2.Id });
+                
                 await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData2.Id });
                 await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData1.Id });
             });
@@ -205,7 +206,7 @@ namespace TaskTracker.API.Tests
         [Fact]
         public async Task RemoveRelation()
         {
-            var client = _factory.CreateClient();
+            var client = await CreateClientWithJwt();
 
             await DoWorkAsync(async sp =>
             {
@@ -227,7 +228,7 @@ namespace TaskTracker.API.Tests
         [Fact]
         public async Task Get_without_subs_relations()
         {
-            var client = _factory.CreateClient();
+            var client = await CreateClientWithJwt();
 
             await DoWorkAsync(async sp =>
             {
@@ -251,7 +252,7 @@ namespace TaskTracker.API.Tests
         [Fact]
         public async Task Get_with_subs_relations()
         {
-            var client = _factory.CreateClient();
+            var client = await CreateClientWithJwt();
 
             await DoWorkAsync(async sp =>
             {
@@ -303,6 +304,19 @@ namespace TaskTracker.API.Tests
                 Status = status,
                 Priority = priority
             };
+        }
+
+        private async Task<HttpClient> CreateClientWithJwt()
+        {
+            var client = _factory.CreateClient();
+            var bearerToken = await GetAccessTokenAsync(client);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+            return client;
+        }
+
+        private static Task<string> GetAccessTokenAsync(HttpClient client)
+        {
+            return client.GetStringAsync("/JwtGenerator/gen-token?userId=test&username=test");
         }
     }
 }

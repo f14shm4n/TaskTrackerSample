@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using TaskTracker.API.Application.Commands;
@@ -7,6 +8,7 @@ using TaskTracker.API.Application.Queries;
 
 namespace TaskTracker.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     [Produces("application/json")]
@@ -21,6 +23,12 @@ namespace TaskTracker.API.Controllers
             _mediator = mediator;
         }
 
+        /// <summary>
+        /// Создает новую задачу.
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        /// <response code="200">Возвращаетя если объект был успешно создан.</response>
         [HttpPost("create-task")]
         [ProducesResponseType(typeof(CreateWorkAssignmentCommandResponse), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<CreateWorkAssignmentCommandResponse>> CreateTask([FromBody] CreateWorkAssignmentCommand command)
@@ -28,6 +36,11 @@ namespace TaskTracker.API.Controllers
             return await _mediator.Send(command);
         }
 
+        /// <summary>
+        /// Пытается найти и вернуть задачу по идентфикатору.
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
         [HttpGet("get-task")]
         [ProducesResponseType(typeof(GetWorkAssignmentByIdQueryResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
