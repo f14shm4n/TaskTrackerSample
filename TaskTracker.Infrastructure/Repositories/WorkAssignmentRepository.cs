@@ -47,8 +47,9 @@ namespace TaskTracker.Infrastructure.Repositories
 
                     await transaction.CommitAsync(cancellationToken);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    _logger.LogError(ex, "Unable to commit transaction while deleting work assignment. WorkAssignmentId: '{ID}'", id);
                     await transaction.RollbackAsync(cancellationToken);
                     throw;
                 }
