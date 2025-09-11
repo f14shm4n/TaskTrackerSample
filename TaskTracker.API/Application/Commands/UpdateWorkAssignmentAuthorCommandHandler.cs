@@ -6,23 +6,23 @@ namespace TaskTracker.API.Application.Commands
     public class UpdateWorkAssignmentAuthorCommandHandler : IRequestHandler<UpdateWorkAssignmentAuthorCommand, UpdateWorkAssignmentAuthorCommandResponse>
     {
         private readonly ILogger<UpdateWorkAssignmentAuthorCommandHandler> _logger;
-        private readonly IWorkAssignmentRepository _taskRepository;
+        private readonly IWorkAssignmentRepository _workRepository;
 
         public UpdateWorkAssignmentAuthorCommandHandler(ILogger<UpdateWorkAssignmentAuthorCommandHandler> logger, IWorkAssignmentRepository taskRepository)
         {
             _logger = logger;
-            _taskRepository = taskRepository;
+            _workRepository = taskRepository;
         }
 
         public async Task<UpdateWorkAssignmentAuthorCommandResponse> Handle(UpdateWorkAssignmentAuthorCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                var entity = await _taskRepository.GetAsync(request.Id, cancellationToken);
+                var entity = await _workRepository.GetAsync(request.Id, cancellationToken);
                 if (entity is not null)
                 {
                     entity.SetAuthor(request.NewAuthor);
-                    var r = await _taskRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
+                    var r = await _workRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
                     return new UpdateWorkAssignmentAuthorCommandResponse(r > 0);
                 }
             }

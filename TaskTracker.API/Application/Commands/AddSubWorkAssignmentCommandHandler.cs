@@ -6,12 +6,12 @@ namespace TaskTracker.API.Application.Commands
     public class AddSubWorkAssignmentCommandHandler : IRequestHandler<AddSubWorkAssignmentCommand, AddSubWorkAssignmentCommandResponse>
     {
         private readonly ILogger<AddSubWorkAssignmentCommandHandler> _logger;
-        private readonly IWorkAssignmentRepository _taskRepository;
+        private readonly IWorkAssignmentRepository _workRepository;
 
         public AddSubWorkAssignmentCommandHandler(ILogger<AddSubWorkAssignmentCommandHandler> logger, IWorkAssignmentRepository taskRepository)
         {
             _logger = logger;
-            _taskRepository = taskRepository;
+            _workRepository = taskRepository;
         }
 
         public async Task<AddSubWorkAssignmentCommandResponse> Handle(AddSubWorkAssignmentCommand request, CancellationToken cancellationToken)
@@ -24,19 +24,19 @@ namespace TaskTracker.API.Application.Commands
                     return Fail();
                 }
 
-                if (!await _taskRepository.ContainsAsync(request.WorkAssignmentId, cancellationToken))
+                if (!await _workRepository.ContainsAsync(request.WorkAssignmentId, cancellationToken))
                 {
                     return Fail();
                 }
 
-                var subWork = await _taskRepository.GetAsync(request.SubWorkAssignmentId, cancellationToken);
+                var subWork = await _workRepository.GetAsync(request.SubWorkAssignmentId, cancellationToken);
                 if (subWork is null)
                 {
                     return Fail();
                 }
 
                 subWork.SetHeadAssignment(request.WorkAssignmentId);
-                var r = await _taskRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
+                var r = await _workRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
                 return r > 0 ? Success() : Fail();
             }
             catch (Exception ex)

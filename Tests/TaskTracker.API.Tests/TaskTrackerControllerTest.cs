@@ -139,7 +139,7 @@ namespace TaskTracker.API.Tests
             await DoWorkAsync(async sp =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
-                var taskData1 = await mediator.Send(GetCreateTaskCommand(title: "Maste task #1"));
+                var taskData1 = await mediator.Send(GetCreateTaskCommand(title: "Master task #1"));
                 var taskData2 = await mediator.Send(GetCreateTaskCommand(title: "Sub task #1-1"));
 
                 var rsp = await client.PutAsJsonAsync("/TaskTracker/add-sub-task", new AddSubWorkAssignmentCommand { WorkAssignmentId = taskData1.Id, SubWorkAssignmentId = taskData2.Id });
@@ -160,12 +160,56 @@ namespace TaskTracker.API.Tests
             await DoWorkAsync(async sp =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
-                var taskData1 = await mediator.Send(GetCreateTaskCommand(title: "Maste task #1"));
+                var taskData1 = await mediator.Send(GetCreateTaskCommand(title: "Master task #1"));
                 var taskData2 = await mediator.Send(GetCreateTaskCommand(title: "Sub task #1-1"));
                 await mediator.Send(new AddSubWorkAssignmentCommand { WorkAssignmentId = taskData1.Id, SubWorkAssignmentId = taskData2.Id });
 
                 var rsp = await client.PutAsJsonAsync("/TaskTracker/clear-master-task", new ClearHeadWorkAssignmentCommand { Id = taskData2.Id });
                 var data = await rsp.Content.ReadFromJsonAsync<ClearHeadWorkAssignmentCommandResponse>();
+                data.Should().NotBeNull();
+                data.Success.Should().BeTrue();
+
+                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData2.Id });
+                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData1.Id });
+            });
+        }
+
+        [Fact]
+        public async Task SetRelation()
+        {
+            var client = _factory.CreateClient();
+
+            await DoWorkAsync(async sp =>
+            {
+                var mediator = sp.GetRequiredService<IMediator>();
+                var taskData1 = await mediator.Send(GetCreateTaskCommand(title: "Task #1"));
+                var taskData2 = await mediator.Send(GetCreateTaskCommand(title: "Task #2"));
+
+                var rsp = await client.PutAsJsonAsync("/TaskTracker/set-relation", new AddWorkAssignmentRelationCommand { Relation = WorkAssignmentRelationType.RelativeTo, SourceId = taskData1.Id, TargetId = taskData2.Id });
+                var data = await rsp.Content.ReadFromJsonAsync<AddWorkAssignmentRelationCommandResponse>();
+                data.Should().NotBeNull();
+                data.Success.Should().BeTrue();
+
+                await mediator.Send(new RemoveWorkAssignmentRelationCommand { Relation = WorkAssignmentRelationType.RelativeTo, SourceId = taskData1.Id, TargetId = taskData2.Id });
+                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData2.Id });
+                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData1.Id });
+            });
+        }
+
+        [Fact]
+        public async Task RemoveRelation()
+        {
+            var client = _factory.CreateClient();
+
+            await DoWorkAsync(async sp =>
+            {
+                var mediator = sp.GetRequiredService<IMediator>();
+                var taskData1 = await mediator.Send(GetCreateTaskCommand(title: "Task #1"));
+                var taskData2 = await mediator.Send(GetCreateTaskCommand(title: "Task #2"));
+                await mediator.Send(new AddWorkAssignmentRelationCommand { Relation = WorkAssignmentRelationType.RelativeTo, SourceId = taskData1.Id, TargetId = taskData2.Id });
+
+                var rsp = await client.PutAsJsonAsync("/TaskTracker/remove-relation", new RemoveWorkAssignmentRelationCommand { Relation = WorkAssignmentRelationType.RelativeTo, SourceId = taskData1.Id, TargetId = taskData2.Id });
+                var data = await rsp.Content.ReadFromJsonAsync<RemoveWorkAssignmentRelationCommandResponse>();
                 data.Should().NotBeNull();
                 data.Success.Should().BeTrue();
 

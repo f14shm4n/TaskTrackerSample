@@ -6,23 +6,23 @@ namespace TaskTracker.API.Application.Commands
     public class UpdateWorkAssignmentPriorityCommandHandler : IRequestHandler<UpdateWorkAssignmentPriorityCommand, UpdateWorkAssignmentPriorityCommandResponse>
     {
         private readonly ILogger<UpdateWorkAssignmentPriorityCommandHandler> _logger;
-        private readonly IWorkAssignmentRepository _taskRepository;
+        private readonly IWorkAssignmentRepository _workRepository;
 
         public UpdateWorkAssignmentPriorityCommandHandler(ILogger<UpdateWorkAssignmentPriorityCommandHandler> logger, IWorkAssignmentRepository taskRepository)
         {
             _logger = logger;
-            _taskRepository = taskRepository;
+            _workRepository = taskRepository;
         }
 
         public async Task<UpdateWorkAssignmentPriorityCommandResponse> Handle(UpdateWorkAssignmentPriorityCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                var entity = await _taskRepository.GetAsync(request.Id, cancellationToken);
+                var entity = await _workRepository.GetAsync(request.Id, cancellationToken);
                 if (entity is not null)
                 {
                     entity.SetPriority(request.NewPriority);
-                    var r = await _taskRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
+                    var r = await _workRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
                     return new UpdateWorkAssignmentPriorityCommandResponse(r > 0);
                 }
             }

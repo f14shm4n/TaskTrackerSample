@@ -6,12 +6,12 @@ namespace TaskTracker.API.Application.Commands
     public class DeleteWorkAssignmentCommandHandler : IRequestHandler<DeleteWorkAssignmentCommand, DeleteWorkAssignmentCommandResponse>
     {
         private readonly ILogger<DeleteWorkAssignmentCommandHandler> _logger;
-        private readonly IWorkAssignmentRepository _taskRepository;
+        private readonly IWorkAssignmentRepository _workRepository;
 
         public DeleteWorkAssignmentCommandHandler(ILogger<DeleteWorkAssignmentCommandHandler> logger, IWorkAssignmentRepository taskRepository)
         {
             _logger = logger;
-            _taskRepository = taskRepository;
+            _workRepository = taskRepository;
         }
 
         public async Task<DeleteWorkAssignmentCommandResponse> Handle(DeleteWorkAssignmentCommand request, CancellationToken cancellationToken)
@@ -19,7 +19,7 @@ namespace TaskTracker.API.Application.Commands
             DeleteWorkAssignmentCommandResponse response;
             try
             {
-                response = new DeleteWorkAssignmentCommandResponse(await _taskRepository.DeleteAsync(request.Id, cancellationToken));
+                response = new DeleteWorkAssignmentCommandResponse(await _workRepository.DeleteAsync(request.Id, cancellationToken));
             }
             catch (Exception ex)
             {

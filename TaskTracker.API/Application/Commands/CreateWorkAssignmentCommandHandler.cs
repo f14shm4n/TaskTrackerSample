@@ -9,12 +9,12 @@ namespace TaskTracker.API.Application.Commands
     public class CreateWorkAssignmentCommandHandler : IRequestHandler<CreateWorkAssignmentCommand, CreateWorkAssignmentCommandResponse>
     {
         private readonly ILogger<CreateWorkAssignmentCommandHandler> _logger;
-        private readonly IWorkAssignmentRepository _taskRepository;
+        private readonly IWorkAssignmentRepository _workRepository;
 
         public CreateWorkAssignmentCommandHandler(ILogger<CreateWorkAssignmentCommandHandler> logger, IWorkAssignmentRepository taskRepository)
         {
             _logger = logger;
-            _taskRepository = taskRepository;
+            _workRepository = taskRepository;
         }
 
         public async Task<CreateWorkAssignmentCommandResponse> Handle(CreateWorkAssignmentCommand request, CancellationToken cancellationToken)
@@ -24,8 +24,8 @@ namespace TaskTracker.API.Application.Commands
             {
                 var entity = request.ToWorkAssignment();
 
-                _taskRepository.Add(entity);
-                await _taskRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
+                _workRepository.Add(entity);
+                await _workRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
 
                 response = new CreateWorkAssignmentCommandResponse(entity.Id);
             }
