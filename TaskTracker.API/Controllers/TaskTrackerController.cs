@@ -31,7 +31,7 @@ namespace TaskTracker.API.Controllers
         [HttpPost("create-task")]
         [ProducesResponseType(typeof(CreateWorkAssignmentCommandResponse), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<CreateWorkAssignmentCommandResponse>> CreateTask([FromBody] CreateWorkAssignmentCommand command)
-        {            
+        {
             return await _mediator.Send(command);
         }
 
@@ -53,6 +53,18 @@ namespace TaskTracker.API.Controllers
                 return NotFound();
             }
             return rsp;
+        }
+
+        /// <summary>
+        /// Gets the task collection.
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns>An object containing the task list.</returns>
+        [HttpGet("get-tasks")]
+        [ProducesResponseType(typeof(GetWorkAssignmentByIdQueryResponse), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<GetWorkAssignmentListQueryResponse>> GetTasks([FromQuery] GetWorkAssignmentListQuery query)
+        {
+            return await _mediator.Send(query);
         }
 
         /// <summary>

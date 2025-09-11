@@ -11,5 +11,7 @@ namespace TaskTracker.Domain.Aggregates.WorkAssignment
         Task<bool> HasRelationAsync(WorkAssignmentRelationType relationType, int sourceId, int targetId, CancellationToken cancellationToken);
         Task<WorkAssignment?> GetWithRelationsAsync(int id, CancellationToken cancellationToken);
         Task<WorkAssignment?> GetWithRelationsAndSubsAsync(int id, CancellationToken cancellationToken);
+        Task<IEnumerable<WorkAssignment>> GetCollectionAsync(int skip, int take, bool onlyHeadLevelObjects, CancellationToken cancellationToken);
+        Task<IEnumerable<WorkAssignment>> GetCollectionWithIncludesAsync(int skip, int take, bool onlyHeadLevelObjects, CancellationToken cancellationToken);
     }
 }

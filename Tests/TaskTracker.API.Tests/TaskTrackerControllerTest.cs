@@ -1,5 +1,6 @@
 using FluentAssertions;
 using MediatR;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -280,6 +281,26 @@ namespace TaskTracker.API.Tests
             });
         }
 
+        [Fact]
+        public async Task GetTasks_without_relations()
+        {
+            const int taskCount = 5;
+            var client = await CreateClientWithJwt();
+
+            await DoWorkAsync(async sp =>
+            {
+                var mediator = sp.GetRequiredService<IMediator>();
+                var taskIds = await CreateTaskListAsync(taskCount, mediator);
+                var data = await client.GetFromJsonAsync<GetWorkAssignmentListQueryResponse>($"/TaskTracker/get-tasks?withRelatedData=false", _jsonOptions);
+                data.Should().NotBeNull();
+                data.TaskList.Should().HaveCountGreaterThanOrEqualTo(taskCount);
+
+                await RemoveTaskListAsync(taskIds, mediator);
+            });
+        }
+
+        #region Utils
+
         private async Task DoWorkAsync(Func<IServiceProvider, Task> work)
         {
             using (var scope = _factory.Services.CreateScope())
@@ -317,5 +338,25 @@ namespace TaskTracker.API.Tests
         {
             return client.GetStringAsync("/JwtGenerator/gen-token?userId=test&username=test");
         }
+
+        private static async Task<IEnumerable<int>> CreateTaskListAsync(int count, IMediator mediator)
+        {
+            var taskIds = new List<int>();
+            for (var i = 0; i < count; i++)
+            {
+                taskIds.Add((await mediator.Send(GetCreateTaskCommand(title: $"Task #{i + 1}"))).TaskInfo!.Id);
+            }
+            return taskIds;
+        }
+
+        private static async Task RemoveTaskListAsync(IEnumerable<int> ids, IMediator mediator)
+        {
+            foreach (var id in ids)
+            {
+                await mediator.Send(new DeleteWorkAssignmentCommand { Id = id });
+            }
+        }
+
+        #endregion
     }
 }

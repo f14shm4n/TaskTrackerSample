@@ -80,6 +80,26 @@ namespace TaskTracker.Infrastructure.Repositories
                 .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
+        public async Task<IEnumerable<WorkAssignment>> GetCollectionAsync(int skip, int take, bool onlyHeadLevelObjects, CancellationToken cancellationToken)
+        {
+            return await GetInitQueryCollection(onlyHeadLevelObjects)
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<IEnumerable<WorkAssignment>> GetCollectionWithIncludesAsync(int skip, int take, bool onlyHeadLevelObjects, CancellationToken cancellationToken)
+        {
+            return await GetInitQueryCollection(onlyHeadLevelObjects)
+                .Include(x => x.SubAssignment)
+                .Include(x => x.OutRelations)
+                .Include(x => x.InRelations)
+                .Include(x => x.HeadAssignment)
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync(cancellationToken);
+        }
+
         public Task<bool> ContainsAsync(int id, CancellationToken cancellationToken)
         {
             return _context.WorkAssignments.AnyAsync(x => x.Id == id, cancellationToken);
@@ -88,6 +108,11 @@ namespace TaskTracker.Infrastructure.Repositories
         public Task<bool> HasRelationAsync(WorkAssignmentRelationType relationType, int sourceId, int targetId, CancellationToken cancellationToken)
         {
             return _context.WorkAssignmentRelationships.AnyAsync(x => x.Relation == relationType && x.SourceWorkAssignmentId == sourceId && x.TargetWorkAssignmentId == targetId, cancellationToken);
+        }
+
+        private IQueryable<WorkAssignment> GetInitQueryCollection(bool onlyHeadLevelObjects)
+        {
+            return onlyHeadLevelObjects ? _context.WorkAssignments.Where(x => x.HeadAssignemtId == null) : _context.WorkAssignments;
         }
     }
 }
