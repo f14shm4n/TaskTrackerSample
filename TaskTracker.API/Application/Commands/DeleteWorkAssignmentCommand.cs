@@ -6,7 +6,7 @@ namespace TaskTracker.API.Application.Commands
     public class DeleteWorkAssignmentCommand : IRequest<DeleteWorkAssignmentCommandResponse>
     {
         /// <summary>
-        /// Идентификатор задачи, которую нужно удалить.
+        /// The identifier of the task that needs to be deleted.
         /// </summary>
         [Required]
         public int Id { get; set; }

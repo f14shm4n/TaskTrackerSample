@@ -15,6 +15,10 @@ namespace TaskTracker.API.Controllers
     {
         private readonly AppJwtOptions _options;
 
+        /// <summary>
+        /// Creates new JSON token. You may input any data.
+        /// </summary>
+        /// <param name="options"></param>
         public JwtGeneratorController(IOptions<AppJwtOptions> options)
         {
             _options = options.Value;

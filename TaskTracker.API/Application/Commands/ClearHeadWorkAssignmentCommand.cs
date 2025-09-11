@@ -6,7 +6,7 @@ namespace TaskTracker.API.Application.Commands
     public class ClearHeadWorkAssignmentCommand : IRequest<ClearHeadWorkAssignmentCommandResponse>
     {
         /// <summary>
-        /// Идентификатор подзадачи, для которой нужно убрать задачу верхнего уровня.
+        /// The identifier of the subtask for which the parent task needs to be removed.
         /// </summary>
         [Required]
         public int Id { get; set; }

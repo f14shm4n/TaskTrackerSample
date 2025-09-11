@@ -25,7 +25,6 @@ services:
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=task_tracker;User Id=sa;Password=YourStrongPassword!;TrustServerCertificate=true;
       - ASPNETCORE_ENVIRONMENT=Development
     ports:
-      - "5000:80"
       - "8080:8080"
     depends_on:
       - sqlserver

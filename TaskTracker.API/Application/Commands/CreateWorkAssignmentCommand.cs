@@ -9,26 +9,26 @@ namespace TaskTracker.API.Application.Commands
     public class CreateWorkAssignmentCommand : IRequest<CreateWorkAssignmentCommandResponse>
     {
         /// <summary>
-        /// Название задачи.
+        /// The title of the task.
         /// </summary>
         public string? Title { get; set; }
         /// <summary>
-        /// Статус задачи.
+        /// The status of the task.
         /// </summary>
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public WorkAssignmentStatus Status { get; set; }
         /// <summary>
-        /// Приоритет задачи.
+        /// The priority of the task.
         /// </summary>
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public WorkAssignmentPriority Priority { get; set; }
         /// <summary>
-        /// Автор задачи.
+        /// The author of the task.
         /// </summary>
         [Required]
         public string Author { get; set; } = string.Empty;
         /// <summary>
-        /// Исполнитель задачи.
+        /// The assignee of the task.
         /// </summary>
         public string? Worker { get; set; }
     }

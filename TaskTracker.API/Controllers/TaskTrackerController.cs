@@ -24,10 +24,10 @@ namespace TaskTracker.API.Controllers
         }
 
         /// <summary>
-        /// Создает новую задачу.
+        /// Creates a new task.
         /// </summary>
         /// <param name="command"></param>
-        /// <returns>Объект содержащий новую задачу.</returns>
+        /// <returns>An object containing the new task.</returns>
         [HttpPost("create-task")]
         [ProducesResponseType(typeof(CreateWorkAssignmentCommandResponse), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<CreateWorkAssignmentCommandResponse>> CreateTask([FromBody] CreateWorkAssignmentCommand command)
@@ -36,12 +36,12 @@ namespace TaskTracker.API.Controllers
         }
 
         /// <summary>
-        /// Пытается найти и вернуть задачу по идентификатору.
+        /// Attempts to find and return a task by its identifier.
         /// </summary>
         /// <param name="query"></param>
-        /// <returns>Объект содержащий данные найденной задачи.</returns>
-        /// <response code="200">Возвращается если объект найден.</response>
-        /// <response code="404">Возвращается если объект не найден.</response>
+        /// <returns>An object containing the data of the found task.</returns>
+        /// <response code="200">Returned if the object is found.</response>
+        /// <response code="404">Returned if the object is not found.</response>
         [HttpGet("get-task")]
         [ProducesResponseType(typeof(GetWorkAssignmentByIdQueryResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
@@ -56,10 +56,10 @@ namespace TaskTracker.API.Controllers
         }
 
         /// <summary>
-        /// Удаляет задачу используя предоставленный идентификатор.
+        /// Deletes a task using the provided identifier.
         /// </summary>
         /// <param name="command"></param>
-        /// <returns></returns>        
+        /// <returns></returns>    
         [HttpDelete("delete-task")]
         [ProducesResponseType(typeof(DeleteWorkAssignmentCommandResponse), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<DeleteWorkAssignmentCommandResponse>> DeleteTask([FromQuery] DeleteWorkAssignmentCommand command)
@@ -68,7 +68,7 @@ namespace TaskTracker.API.Controllers
         }
 
         /// <summary>
-        /// Обновляет статус указанной задачи.
+        /// Updates the status of the specified task.
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
@@ -80,7 +80,7 @@ namespace TaskTracker.API.Controllers
         }
 
         /// <summary>
-        /// Обновляет приоритет указанной задачи.
+        /// Updates the priority of the specified task.
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
@@ -92,7 +92,7 @@ namespace TaskTracker.API.Controllers
         }
 
         /// <summary>
-        /// Задает автора для указанной задачи.
+        /// Updates the author of the specified task.
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
@@ -104,7 +104,7 @@ namespace TaskTracker.API.Controllers
         }
 
         /// <summary>
-        /// Задаёт исполнителя указанной задачи.
+        /// Updates the worker of the specified task.
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
@@ -116,7 +116,7 @@ namespace TaskTracker.API.Controllers
         }
 
         /// <summary>
-        /// Устанавливает связь между двумя задачи так, то одна задача становится подзадачей другой.
+        /// Sets a relationship between two tasks so that one task becomes a subtask of the other.
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
@@ -128,7 +128,7 @@ namespace TaskTracker.API.Controllers
         }
 
         /// <summary>
-        /// Разрывает связь между задачей и подзадачей, для указанного идентификатора подзадачи.
+        /// Removes a relationship between two tasks.
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
@@ -140,7 +140,7 @@ namespace TaskTracker.API.Controllers
         }
 
         /// <summary>
-        /// Создает двунаправленное отношение между двумя задачами.
+        /// Creates the two way relation between tasks.
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
@@ -152,7 +152,7 @@ namespace TaskTracker.API.Controllers
         }
 
         /// <summary>
-        /// Удаляет двунаправленной отношение между двумя задачами.
+        /// Removes the two way relations between tasks.
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>

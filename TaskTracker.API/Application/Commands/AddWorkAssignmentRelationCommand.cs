@@ -7,17 +7,17 @@ namespace TaskTracker.API.Application.Commands
     public class AddWorkAssignmentRelationCommand : IRequest<AddWorkAssignmentRelationCommandResponse>
     {
         /// <summary>
-        /// Тип связи между задачами.
+        /// The type of relationship between tasks.
         /// </summary>
         [Required]
         public WorkAssignmentRelationType Relation { get; set; }
         /// <summary>
-        /// Идентификатор задачи, которая связывается с другой задачей.
+        /// The identifier of the task that is being linked to another task.
         /// </summary>
         [Required]
         public int SourceId { get; set; }
         /// <summary>
-        /// Идентификатор задачи, с которой связывается другая задача.
+        /// The identifier of the task to which another task is being linked.
         /// </summary>
         [Required]
         public int TargetId { get; set; }
