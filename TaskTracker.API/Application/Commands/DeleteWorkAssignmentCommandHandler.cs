@@ -19,7 +19,7 @@ namespace TaskTracker.API.Application.Commands
             DeleteWorkAssignmentCommandResponse response;
             try
             {
-                response = new DeleteWorkAssignmentCommandResponse(await _workRepository.DeleteAsync(request.Id, request.ReleaseSubTasks, cancellationToken));
+                response = new DeleteWorkAssignmentCommandResponse(await _workRepository.DeleteAsync(request.Id, cancellationToken));
             }
             catch (Exception ex)
             {

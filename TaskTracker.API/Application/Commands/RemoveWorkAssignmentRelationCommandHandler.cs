@@ -30,22 +30,16 @@ namespace TaskTracker.API.Application.Commands
                 }
 
                 var source = await _workRepository.GetWithRelationsAsync(request.SourceId, cancellationToken);
-                var target = await _workRepository.GetWithRelationsAsync(request.TargetId, cancellationToken);
-
                 if (source is null)
-                {
-                    return Fail();
-                }
-                if (target is null)
                 {
                     return Fail();
                 }
 
                 // Since we have only one type WorkAssignmentRelationType.RelativeTo
-                // which means that the realtion is two way out
+                // which means that the relation is two way out
                 // Source <--> Target
-                source.RemoveOutRelation(request.Relation, target.Id);
-                target.RemoveOutRelation(request.Relation, source.Id);
+                source.RemoveOutRelation(request.Relation, request.TargetId);
+                source.RemoveInRelation(request.Relation, request.TargetId);
 
                 var r = await _workRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
                 return r > 0 ? Success() : Fail();

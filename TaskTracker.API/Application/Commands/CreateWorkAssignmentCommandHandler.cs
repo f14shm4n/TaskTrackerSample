@@ -27,12 +27,12 @@ namespace TaskTracker.API.Application.Commands
                 _workRepository.Add(entity);
                 await _workRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
 
-                response = new CreateWorkAssignmentCommandResponse(entity.Id);
+                response = new CreateWorkAssignmentCommandResponse(entity.ToWorkAssignmentDto());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unable to add new work assignment to the data base.");
-                response = new CreateWorkAssignmentCommandResponse(0);
+                response = new CreateWorkAssignmentCommandResponse(null);
             }
             return response;
         }

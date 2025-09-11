@@ -1,7 +1,6 @@
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc.Testing;
-using System;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -32,11 +31,11 @@ namespace TaskTracker.API.Tests
             await DoWorkAsync(async sp =>
             {
                 var rsp = await client.PostAsJsonAsync("/TaskTracker/create-task", GetCreateTaskCommand());
-                var taskData = await rsp.Content.ReadFromJsonAsync<CreateWorkAssignmentCommandResponse>();
+                var taskData = await rsp.Content.ReadFromJsonAsync<CreateWorkAssignmentCommandResponse>(_jsonOptions);
                 taskData.Should().NotBeNull();
-                taskData.Id.Should().BeGreaterThan(0);
+                taskData.TaskInfo.Should().NotBeNull();
 
-                await sp.GetRequiredService<IMediator>().Send(new DeleteWorkAssignmentCommand { Id = taskData.Id });
+                await sp.GetRequiredService<IMediator>().Send(new DeleteWorkAssignmentCommand { Id = taskData.TaskInfo.Id });
             });
         }
 
@@ -50,7 +49,7 @@ namespace TaskTracker.API.Tests
                 var mediator = sp.GetRequiredService<IMediator>();
                 var taskData = await mediator.Send(GetCreateTaskCommand());
 
-                var rsp = await client.DeleteAsync($"/TaskTracker/delete-task?id={taskData.Id}");
+                var rsp = await client.DeleteAsync($"/TaskTracker/delete-task?id={taskData.TaskInfo!.Id}");
                 var data = await rsp.Content.ReadFromJsonAsync<DeleteWorkAssignmentCommandResponse>();
                 data.Should().NotBeNull();
                 data.Success.Should().BeTrue();
@@ -67,12 +66,12 @@ namespace TaskTracker.API.Tests
                 var mediator = sp.GetRequiredService<IMediator>();
                 var taskData = await mediator.Send(GetCreateTaskCommand());
 
-                var rsp = await client.PutAsJsonAsync("/TaskTracker/update-task-status", new UpdateWorkAssignmentStatusCommand { Id = taskData.Id, NewStatus = WorkAssignmentStatus.InProgress });
+                var rsp = await client.PutAsJsonAsync("/TaskTracker/update-task-status", new UpdateWorkAssignmentStatusCommand { Id = taskData.TaskInfo!.Id, NewStatus = WorkAssignmentStatus.InProgress });
                 var data = await rsp.Content.ReadFromJsonAsync<UpdateWorkAssignmentStatusCommandResponse>();
                 data.Should().NotBeNull();
                 data.Success.Should().BeTrue();
 
-                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData.Id });
+                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData.TaskInfo!.Id });
             });
         }
 
@@ -86,12 +85,12 @@ namespace TaskTracker.API.Tests
                 var mediator = sp.GetRequiredService<IMediator>();
                 var taskData = await mediator.Send(GetCreateTaskCommand());
 
-                var rsp = await client.PutAsJsonAsync("/TaskTracker/update-task-priority", new UpdateWorkAssignmentPriorityCommand { Id = taskData.Id, NewPriority = WorkAssignmentPriority.Medium });
+                var rsp = await client.PutAsJsonAsync("/TaskTracker/update-task-priority", new UpdateWorkAssignmentPriorityCommand { Id = taskData.TaskInfo!.Id, NewPriority = WorkAssignmentPriority.Medium });
                 var data = await rsp.Content.ReadFromJsonAsync<UpdateWorkAssignmentPriorityCommandResponse>();
                 data.Should().NotBeNull();
                 data.Success.Should().BeTrue();
 
-                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData.Id });
+                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData.TaskInfo!.Id });
             });
         }
 
@@ -105,12 +104,12 @@ namespace TaskTracker.API.Tests
                 var mediator = sp.GetRequiredService<IMediator>();
                 var taskData = await mediator.Send(GetCreateTaskCommand());
 
-                var rsp = await client.PutAsJsonAsync("/TaskTracker/update-task-author", new UpdateWorkAssignmentAuthorCommand { Id = taskData.Id, NewAuthor = "Sergey" });
+                var rsp = await client.PutAsJsonAsync("/TaskTracker/update-task-author", new UpdateWorkAssignmentAuthorCommand { Id = taskData.TaskInfo!.Id, NewAuthor = "Sergey" });
                 var data = await rsp.Content.ReadFromJsonAsync<UpdateWorkAssignmentAuthorCommandResponse>();
                 data.Should().NotBeNull();
                 data.Success.Should().BeTrue();
 
-                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData.Id });
+                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData.TaskInfo!.Id });
             });
         }
 
@@ -130,12 +129,12 @@ namespace TaskTracker.API.Tests
                 var mediator = sp.GetRequiredService<IMediator>();
                 var taskData = await mediator.Send(GetCreateTaskCommand(worker: oldWorker));
 
-                var rsp = await client.PutAsJsonAsync("/TaskTracker/update-task-worker", new UpdateWorkAssignmentWorkerCommand { Id = taskData.Id, NewWorker = newWorker });
+                var rsp = await client.PutAsJsonAsync("/TaskTracker/update-task-worker", new UpdateWorkAssignmentWorkerCommand { Id = taskData.TaskInfo!.Id, NewWorker = newWorker });
                 var data = await rsp.Content.ReadFromJsonAsync<UpdateWorkAssignmentWorkerCommandResponse>();
                 data.Should().NotBeNull();
                 data.Success.Should().BeTrue();
 
-                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData.Id });
+                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData.TaskInfo!.Id });
             });
         }
 
@@ -150,13 +149,13 @@ namespace TaskTracker.API.Tests
                 var taskData1 = await mediator.Send(GetCreateTaskCommand(title: "Master task #1"));
                 var taskData2 = await mediator.Send(GetCreateTaskCommand(title: "Sub task #1-1"));
 
-                var rsp = await client.PutAsJsonAsync("/TaskTracker/add-sub-task", new AddSubWorkAssignmentCommand { WorkAssignmentId = taskData1.Id, SubWorkAssignmentId = taskData2.Id });
+                var rsp = await client.PutAsJsonAsync("/TaskTracker/add-sub-task", new AddSubWorkAssignmentCommand { WorkAssignmentId = taskData1.TaskInfo!.Id, SubWorkAssignmentId = taskData2.TaskInfo!.Id });
                 var data = await rsp.Content.ReadFromJsonAsync<AddSubWorkAssignmentCommandResponse>();
                 data.Should().NotBeNull();
                 data.Success.Should().BeTrue();
 
-                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData2.Id });
-                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData1.Id });
+                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData2.TaskInfo!.Id });
+                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData1.TaskInfo!.Id });
             });
         }
 
@@ -170,15 +169,15 @@ namespace TaskTracker.API.Tests
                 var mediator = sp.GetRequiredService<IMediator>();
                 var taskData1 = await mediator.Send(GetCreateTaskCommand(title: "Master task #1"));
                 var taskData2 = await mediator.Send(GetCreateTaskCommand(title: "Sub task #1-1"));
-                await mediator.Send(new AddSubWorkAssignmentCommand { WorkAssignmentId = taskData1.Id, SubWorkAssignmentId = taskData2.Id });
+                await mediator.Send(new AddSubWorkAssignmentCommand { WorkAssignmentId = taskData1.TaskInfo!.Id, SubWorkAssignmentId = taskData2.TaskInfo!.Id });
 
-                var rsp = await client.PutAsJsonAsync("/TaskTracker/clear-master-task", new ClearHeadWorkAssignmentCommand { Id = taskData2.Id });
+                var rsp = await client.PutAsJsonAsync("/TaskTracker/clear-master-task", new ClearHeadWorkAssignmentCommand { Id = taskData2.TaskInfo!.Id });
                 var data = await rsp.Content.ReadFromJsonAsync<ClearHeadWorkAssignmentCommandResponse>();
                 data.Should().NotBeNull();
                 data.Success.Should().BeTrue();
 
-                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData2.Id });
-                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData1.Id });
+                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData2.TaskInfo!.Id });
+                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData1.TaskInfo!.Id });
             });
         }
 
@@ -193,13 +192,13 @@ namespace TaskTracker.API.Tests
                 var taskData1 = await mediator.Send(GetCreateTaskCommand(title: "Task #1"));
                 var taskData2 = await mediator.Send(GetCreateTaskCommand(title: "Task #2"));
 
-                var rsp = await client.PutAsJsonAsync("/TaskTracker/set-relation", new AddWorkAssignmentRelationCommand { Relation = WorkAssignmentRelationType.RelativeTo, SourceId = taskData1.Id, TargetId = taskData2.Id });
+                var rsp = await client.PutAsJsonAsync("/TaskTracker/set-relation", new AddWorkAssignmentRelationCommand { Relation = WorkAssignmentRelationType.RelativeTo, SourceId = taskData1.TaskInfo!.Id, TargetId = taskData2.TaskInfo!.Id });
                 var data = await rsp.Content.ReadFromJsonAsync<AddWorkAssignmentRelationCommandResponse>();
                 data.Should().NotBeNull();
                 data.Success.Should().BeTrue();
-                
-                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData2.Id });
-                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData1.Id });
+
+                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData2.TaskInfo!.Id });
+                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData1.TaskInfo!.Id });
             });
         }
 
@@ -213,15 +212,15 @@ namespace TaskTracker.API.Tests
                 var mediator = sp.GetRequiredService<IMediator>();
                 var taskData1 = await mediator.Send(GetCreateTaskCommand(title: "Task #1"));
                 var taskData2 = await mediator.Send(GetCreateTaskCommand(title: "Task #2"));
-                await mediator.Send(new AddWorkAssignmentRelationCommand { Relation = WorkAssignmentRelationType.RelativeTo, SourceId = taskData1.Id, TargetId = taskData2.Id });
+                await mediator.Send(new AddWorkAssignmentRelationCommand { Relation = WorkAssignmentRelationType.RelativeTo, SourceId = taskData1.TaskInfo!.Id, TargetId = taskData2.TaskInfo!.Id });
 
-                var rsp = await client.PutAsJsonAsync("/TaskTracker/remove-relation", new RemoveWorkAssignmentRelationCommand { Relation = WorkAssignmentRelationType.RelativeTo, SourceId = taskData1.Id, TargetId = taskData2.Id });
+                var rsp = await client.PutAsJsonAsync("/TaskTracker/remove-relation", new RemoveWorkAssignmentRelationCommand { Relation = WorkAssignmentRelationType.RelativeTo, SourceId = taskData1.TaskInfo!.Id, TargetId = taskData2.TaskInfo!.Id });
                 var data = await rsp.Content.ReadFromJsonAsync<RemoveWorkAssignmentRelationCommandResponse>();
                 data.Should().NotBeNull();
                 data.Success.Should().BeTrue();
 
-                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData2.Id });
-                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData1.Id });
+                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData2.TaskInfo!.Id });
+                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData1.TaskInfo!.Id });
             });
         }
 
@@ -236,7 +235,7 @@ namespace TaskTracker.API.Tests
                 var task1 = GetCreateTaskCommand(title: "Task #1");
                 var taskData1 = await mediator.Send(task1);
 
-                var data = await client.GetFromJsonAsync<GetWorkAssignmentByIdQueryResponse>($"/TaskTracker/get-task?id={taskData1.Id}", _jsonOptions);
+                var data = await client.GetFromJsonAsync<GetWorkAssignmentByIdQueryResponse>($"/TaskTracker/get-task?id={taskData1.TaskInfo!.Id}", _jsonOptions);
                 data.Should().NotBeNull();
 
                 var taskInfo = data.TaskInfo!;
@@ -245,7 +244,7 @@ namespace TaskTracker.API.Tests
                 taskInfo.OutRelations.Should().BeNullOrEmpty();
                 taskInfo.InRelations.Should().BeNullOrEmpty();
 
-                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData1.Id });
+                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData1.TaskInfo!.Id });
             });
         }
 
@@ -263,10 +262,10 @@ namespace TaskTracker.API.Tests
                 var taskData1 = await mediator.Send(task1);
                 var taskData2 = await mediator.Send(task2);
                 var taskData3 = await mediator.Send(task3);
-                await mediator.Send(new AddWorkAssignmentRelationCommand { Relation = WorkAssignmentRelationType.RelativeTo, SourceId = taskData1.Id, TargetId = taskData2.Id });
-                await mediator.Send(new AddSubWorkAssignmentCommand { WorkAssignmentId = taskData1.Id, SubWorkAssignmentId = taskData3.Id });
+                await mediator.Send(new AddWorkAssignmentRelationCommand { Relation = WorkAssignmentRelationType.RelativeTo, SourceId = taskData1.TaskInfo!.Id, TargetId = taskData2.TaskInfo!.Id });
+                await mediator.Send(new AddSubWorkAssignmentCommand { WorkAssignmentId = taskData1.TaskInfo!.Id, SubWorkAssignmentId = taskData3.TaskInfo!.Id });
 
-                var data = await client.GetFromJsonAsync<GetWorkAssignmentByIdQueryResponse>($"/TaskTracker/get-task?id={taskData1.Id}", _jsonOptions);
+                var data = await client.GetFromJsonAsync<GetWorkAssignmentByIdQueryResponse>($"/TaskTracker/get-task?id={taskData1.TaskInfo!.Id}", _jsonOptions);
                 data.Should().NotBeNull();
 
                 var taskInfo = data.TaskInfo!;
@@ -275,9 +274,9 @@ namespace TaskTracker.API.Tests
                 taskInfo.OutRelations.Should().NotBeNullOrEmpty();
                 taskInfo.InRelations.Should().NotBeNullOrEmpty();
 
-                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData3.Id });
-                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData2.Id });
-                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData1.Id });
+                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData3.TaskInfo!.Id });
+                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData2.TaskInfo!.Id });
+                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData1.TaskInfo!.Id });
             });
         }
 

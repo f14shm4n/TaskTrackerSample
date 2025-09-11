@@ -6,10 +6,19 @@ namespace TaskTracker.API.Application.Commands
 {
     public class RemoveWorkAssignmentRelationCommand : IRequest<RemoveWorkAssignmentRelationCommandResponse>
     {
+        /// <summary>
+        /// Тип связи между задачами.
+        /// </summary>
         [Required]
         public WorkAssignmentRelationType Relation { get; set; }
+        /// <summary>
+        /// Идентификатор задачи, с исходящей связью.
+        /// </summary>
         [Required]
         public int SourceId { get; set; }
+        /// <summary>
+        /// Идентификатор задачи, с входящей связью.
+        /// </summary>
         [Required]
         public int TargetId { get; set; }
     }

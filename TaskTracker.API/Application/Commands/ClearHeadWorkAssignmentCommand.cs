@@ -5,6 +5,9 @@ namespace TaskTracker.API.Application.Commands
 {
     public class ClearHeadWorkAssignmentCommand : IRequest<ClearHeadWorkAssignmentCommandResponse>
     {
+        /// <summary>
+        /// Идентификатор подзадачи, для которой нужно убрать задачу верхнего уровня.
+        /// </summary>
         [Required]
         public int Id { get; set; }
     }

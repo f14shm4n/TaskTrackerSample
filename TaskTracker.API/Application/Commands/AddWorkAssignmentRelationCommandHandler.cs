@@ -41,7 +41,7 @@ namespace TaskTracker.API.Application.Commands
                 }
 
                 // Since we have only one type WorkAssignmentRelationType.RelativeTo
-                // which means that the realtion is two way out
+                // which means that the relation is two way out
                 // Source <--> Target                 
                 source.AddOutRelation(request.Relation, request.TargetId);
                 source.AddInRelation(request.Relation, request.TargetId);

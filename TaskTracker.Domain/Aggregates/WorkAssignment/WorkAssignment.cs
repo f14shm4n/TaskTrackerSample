@@ -89,5 +89,14 @@ namespace TaskTracker.Domain.Aggregates.WorkAssignment
                 _outRelations.Remove(rel);
             }
         }
+
+        public void RemoveInRelation(WorkAssignmentRelationType relationType, int fromWorkAssignmentId)
+        {
+            var rel = _inRelations.Find(x => x.Relation == relationType && x.SourceWorkAssignmentId == fromWorkAssignmentId);
+            if (rel is not null)
+            {
+                _inRelations.Remove(rel);
+            }
+        }
     }
 }

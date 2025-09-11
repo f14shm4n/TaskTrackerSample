@@ -28,7 +28,7 @@ namespace TaskTracker.Infrastructure.Repositories
             return _context.WorkAssignments.Add(workAssignment).Entity;
         }
 
-        public async Task<bool> DeleteAsync(int id, bool releaseSubTasks, CancellationToken cancellationToken)
+        public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken)
         {
             int rCount = 0;
             await using (var transaction = await _context.Database.BeginTransactionAsync(cancellationToken))
@@ -39,12 +39,9 @@ namespace TaskTracker.Infrastructure.Repositories
                         .Where(x => x.SourceWorkAssignmentId == id || x.TargetWorkAssignmentId == id)
                         .ExecuteDeleteAsync(cancellationToken);
 
-                    if (releaseSubTasks)
-                    {
-                        await _context.WorkAssignments
-                            .Where(x => x.HeadAssignemtId == id)
-                            .ExecuteUpdateAsync(setters => setters.SetProperty(x => x.HeadAssignemtId, (int?)null));
-                    }
+                    await _context.WorkAssignments
+                        .Where(x => x.HeadAssignemtId == id)
+                        .ExecuteUpdateAsync(setters => setters.SetProperty(x => x.HeadAssignemtId, (int?)null));
 
                     rCount = await _context.WorkAssignments.Where(x => x.Id == id).ExecuteDeleteAsync(cancellationToken);
 
