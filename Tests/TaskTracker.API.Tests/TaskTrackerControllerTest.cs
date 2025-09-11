@@ -1,16 +1,22 @@
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc.Testing;
-using System.Threading.Tasks;
+using System;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using TaskTracker.API.Application.Commands;
+using TaskTracker.API.Application.Queries;
 using TaskTracker.Domain.Aggregates.WorkAssignment;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace TaskTracker.API.Tests
 {
     public class TaskTrackerControllerTest : IClassFixture<WebApplicationFactory<Program>>
     {
         private readonly WebApplicationFactory<Program> _factory;
+        private readonly JsonSerializerOptions _jsonOptions = new(JsonSerializerDefaults.Web)
+        {
+            Converters = { new JsonStringEnumConverter() }
+        };
 
         public TaskTrackerControllerTest(WebApplicationFactory<Program> factory)
         {
@@ -213,6 +219,62 @@ namespace TaskTracker.API.Tests
                 data.Should().NotBeNull();
                 data.Success.Should().BeTrue();
 
+                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData2.Id });
+                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData1.Id });
+            });
+        }
+
+        [Fact]
+        public async Task Get_without_subs_relations()
+        {
+            var client = _factory.CreateClient();
+
+            await DoWorkAsync(async sp =>
+            {
+                var mediator = sp.GetRequiredService<IMediator>();
+                var task1 = GetCreateTaskCommand(title: "Task #1");
+                var taskData1 = await mediator.Send(task1);
+
+                var data = await client.GetFromJsonAsync<GetWorkAssignmentByIdQueryResponse>($"/TaskTracker/get-task?id={taskData1.Id}", _jsonOptions);
+                data.Should().NotBeNull();
+
+                var taskInfo = data.TaskInfo!;
+                taskInfo.Title.Should().Be(task1.Title);
+                taskInfo.SubAssignments.Should().BeNullOrEmpty();
+                taskInfo.OutRelations.Should().BeNullOrEmpty();
+                taskInfo.InRelations.Should().BeNullOrEmpty();
+
+                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData1.Id });
+            });
+        }
+
+        [Fact]
+        public async Task Get_with_subs_relations()
+        {
+            var client = _factory.CreateClient();
+
+            await DoWorkAsync(async sp =>
+            {
+                var mediator = sp.GetRequiredService<IMediator>();
+                var task1 = GetCreateTaskCommand(title: "Task #1");
+                var task2 = GetCreateTaskCommand(title: "Task #2");
+                var task3 = GetCreateTaskCommand(title: "Sub Task #3");
+                var taskData1 = await mediator.Send(task1);
+                var taskData2 = await mediator.Send(task2);
+                var taskData3 = await mediator.Send(task3);
+                await mediator.Send(new AddWorkAssignmentRelationCommand { Relation = WorkAssignmentRelationType.RelativeTo, SourceId = taskData1.Id, TargetId = taskData2.Id });
+                await mediator.Send(new AddSubWorkAssignmentCommand { WorkAssignmentId = taskData1.Id, SubWorkAssignmentId = taskData3.Id });
+
+                var data = await client.GetFromJsonAsync<GetWorkAssignmentByIdQueryResponse>($"/TaskTracker/get-task?id={taskData1.Id}", _jsonOptions);
+                data.Should().NotBeNull();
+
+                var taskInfo = data.TaskInfo!;
+                taskInfo.Title.Should().Be(task1.Title);
+                taskInfo.SubAssignments.Should().NotBeNullOrEmpty();
+                taskInfo.OutRelations.Should().NotBeNullOrEmpty();
+                taskInfo.InRelations.Should().NotBeNullOrEmpty();
+
+                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData3.Id });
                 await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData2.Id });
                 await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData1.Id });
             });

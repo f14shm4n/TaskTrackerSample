@@ -35,9 +35,22 @@ namespace TaskTracker.Infrastructure.Repositories
             return _context.WorkAssignments.SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
-        public Task<WorkAssignment?> GetWithOutRelationsAsync(int id, CancellationToken cancellationToken)
+        public Task<WorkAssignment?> GetWithRelationsAsync(int id, CancellationToken cancellationToken)
         {
-            return _context.WorkAssignments.Include(x => x.OutRelations).SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+            return _context.WorkAssignments
+                .Include(x => x.OutRelations)
+                .Include(x => x.InRelations)
+                .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+        }
+
+        public Task<WorkAssignment?> GetWithRelationsAndSubsAsync(int id, CancellationToken cancellationToken)
+        {
+            return _context.WorkAssignments
+                .Include(x => x.SubAssignment)
+                .Include(x => x.OutRelations)
+                .Include(x => x.InRelations)
+                .Include(x => x.HeadAssignment)
+                .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
         public Task<bool> ContainsAsync(int id, CancellationToken cancellationToken)

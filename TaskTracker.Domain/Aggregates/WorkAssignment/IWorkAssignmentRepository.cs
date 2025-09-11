@@ -9,6 +9,7 @@ namespace TaskTracker.Domain.Aggregates.WorkAssignment
         Task<bool> DeleteAsync(int id, CancellationToken cancellationToken);
         Task<bool> ContainsAsync(int id, CancellationToken cancellationToken);
         Task<bool> HasRelationAsync(WorkAssignmentRelationType relationType, int sourceId, int targetId, CancellationToken cancellationToken);
-        Task<WorkAssignment?> GetWithOutRelationsAsync(int id, CancellationToken cancellationToken);
+        Task<WorkAssignment?> GetWithRelationsAsync(int id, CancellationToken cancellationToken);
+        Task<WorkAssignment?> GetWithRelationsAndSubsAsync(int id, CancellationToken cancellationToken);
     }
 }

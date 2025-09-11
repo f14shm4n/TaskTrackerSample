@@ -76,12 +76,10 @@ namespace TaskTracker.Domain.Aggregates.WorkAssignment
         {
             _outRelations.Add(new WorkAssignmentRelationship(relationType, Id, toWorkAssignmentId));
         }
-
-        // Not needed if we have only two way relations
-        //public void AddInRelation(WorkAssignmentRelationType relationType, int fromWorkAssignmentId)
-        //{
-        //    _inRelations.Add(new WorkAssignmentRelationship(relationType, fromWorkAssignmentId, Id));
-        //}
+        public void AddInRelation(WorkAssignmentRelationType relationType, int fromWorkAssignmentId)
+        {
+            _inRelations.Add(new WorkAssignmentRelationship(relationType, fromWorkAssignmentId, Id));
+        }
 
         public void RemoveOutRelation(WorkAssignmentRelationType relationType, int toWorkAssignmentId)
         {

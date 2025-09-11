@@ -29,16 +29,16 @@ namespace TaskTracker.API.Controllers
         }
 
         [HttpGet("get-task")]
-        [ProducesResponseType(typeof(WorkAssignmentDTO), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(GetWorkAssignmentByIdQueryResponse), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<WorkAssignmentDTO>> GetTask([FromQuery] GetTaskByIdQuery query)
+        public async Task<ActionResult<GetWorkAssignmentByIdQueryResponse>> GetTask([FromQuery] GetWorkAssignmentByIdQuery query)
         {
-            var dto = await _mediator.Send(query);
-            if (dto != null)
+            var rsp = await _mediator.Send(query);
+            if (rsp.TaskInfo is null)
             {
-                return dto;
+                return NotFound();
             }
-            return NotFound();
+            return rsp;
         }
 
         [HttpDelete("delete-task")]
@@ -87,6 +87,20 @@ namespace TaskTracker.API.Controllers
         [HttpPut("clear-master-task")]
         [ProducesResponseType(typeof(ClearHeadWorkAssignmentCommandResponse), (int)HttpStatusCode.OK)]
         public async Task<ActionResult<ClearHeadWorkAssignmentCommandResponse>> ClearMasterTask([FromBody] ClearHeadWorkAssignmentCommand command)
+        {
+            return await _mediator.Send(command);
+        }
+
+        [HttpPut("set-relation")]
+        [ProducesResponseType(typeof(AddWorkAssignmentRelationCommandResponse), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<AddWorkAssignmentRelationCommandResponse>> SetRelation([FromBody] AddWorkAssignmentRelationCommand command)
+        {
+            return await _mediator.Send(command);
+        }
+
+        [HttpPut("remove-relation")]
+        [ProducesResponseType(typeof(RemoveWorkAssignmentRelationCommandResponse), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<RemoveWorkAssignmentRelationCommandResponse>> RemoveRelation([FromBody] RemoveWorkAssignmentRelationCommand command)
         {
             return await _mediator.Send(command);
         }
