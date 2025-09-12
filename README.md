@@ -11,5 +11,6 @@
 Для запуска локально:
 - нужен SQLExpress localdb
 - миграции применяются автоматически из **Program.cs**
+- доступ к WepAPi `http://localhost:5000/swagger/index.html`
 
-Так же есть возможность запускать через **docker-compose**.
+Так же есть возможность запускать через **docker-compose**, доступ к WebApi: `http://localhost:8080/swagger/index.html`
