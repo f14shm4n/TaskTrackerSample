@@ -98,6 +98,7 @@ namespace TaskTracker.Infrastructure.Repositories
                 .Include(x => x.InRelations)
                 .Include(x => x.HeadAssignment)
                 .AsSplitQuery()
+                .OrderBy(x => x.Id)
                 .Skip(skip)
                 .Take(take)
                 .ToListAsync(cancellationToken);
