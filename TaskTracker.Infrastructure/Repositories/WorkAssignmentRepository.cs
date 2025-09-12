@@ -67,6 +67,7 @@ namespace TaskTracker.Infrastructure.Repositories
             return _context.WorkAssignments
                 .Include(x => x.OutRelations)
                 .Include(x => x.InRelations)
+                .AsSplitQuery()
                 .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
@@ -77,6 +78,7 @@ namespace TaskTracker.Infrastructure.Repositories
                 .Include(x => x.OutRelations)
                 .Include(x => x.InRelations)
                 .Include(x => x.HeadAssignment)
+                .AsSplitQuery()
                 .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
@@ -95,6 +97,7 @@ namespace TaskTracker.Infrastructure.Repositories
                 .Include(x => x.OutRelations)
                 .Include(x => x.InRelations)
                 .Include(x => x.HeadAssignment)
+                .AsSplitQuery()
                 .Skip(skip)
                 .Take(take)
                 .ToListAsync(cancellationToken);
