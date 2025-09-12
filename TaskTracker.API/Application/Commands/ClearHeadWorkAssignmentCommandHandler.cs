@@ -3,7 +3,7 @@ using TaskTracker.Domain.Aggregates.WorkAssignment;
 
 namespace TaskTracker.API.Application.Commands
 {
-    public class ClearHeadWorkAssignmentCommandHandler : IRequestHandler<ClearHeadWorkAssignmentCommand, ClearHeadWorkAssignmentCommandResponse>
+    public class ClearHeadWorkAssignmentCommandHandler : IRequestHandler<ClearHeadWorkAssignmentCommand, ApiResponseBase>
     {
         private readonly ILogger<ClearHeadWorkAssignmentCommandHandler> _logger;
         private readonly IWorkAssignmentRepository _workRepository;
@@ -14,23 +14,25 @@ namespace TaskTracker.API.Application.Commands
             _workRepository = taskRepository;
         }
 
-        public async Task<ClearHeadWorkAssignmentCommandResponse> Handle(ClearHeadWorkAssignmentCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseBase> Handle(ClearHeadWorkAssignmentCommand request, CancellationToken cancellationToken)
         {
             try
             {
                 var subWork = await _workRepository.GetAsync(request.Id, cancellationToken);
-                if (subWork != null)
+                if (subWork is null)
                 {
-                    subWork.RemoveHeadAssignment();
-                    var r = await _workRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
-                    return new ClearHeadWorkAssignmentCommandResponse(r > 0);
+                    return new ApiResponseBase("The task is not exists.", System.Net.HttpStatusCode.BadRequest);
                 }
+
+                subWork.RemoveHeadAssignment();
+                await _workRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
+                return new ApiResponseBase(true);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unable to remove head WorkAssignment. WorkAssignmentId: '{ID}'.", request.Id);
             }
-            return new ClearHeadWorkAssignmentCommandResponse(false);
+            return new ApiResponseBase(false, System.Net.HttpStatusCode.InternalServerError);
         }
     }
 }

@@ -1,10 +1,11 @@
 ﻿using MediatR;
+using TaskTracker.API.Application.Dto;
 using TaskTracker.API.Application.Extensions;
 using TaskTracker.Domain.Aggregates.WorkAssignment;
 
 namespace TaskTracker.API.Application.Queries
 {
-    public class GetWorkAssignmentListQueryHandler : IRequestHandler<GetWorkAssignmentListQuery, GetWorkAssignmentListQueryResponse>
+    public class GetWorkAssignmentListQueryHandler : IRequestHandler<GetWorkAssignmentListQuery, ApiResponseBase<List<WorkAssignmentDTO>>>
     {
         private readonly ILogger<GetWorkAssignmentListQueryHandler> _logger;
         private readonly IWorkAssignmentRepository _workRepository;
@@ -15,7 +16,7 @@ namespace TaskTracker.API.Application.Queries
             _workRepository = workRepository;
         }
 
-        public async Task<GetWorkAssignmentListQueryResponse> Handle(GetWorkAssignmentListQuery request, CancellationToken cancellationToken)
+        public async Task<ApiResponseBase<List<WorkAssignmentDTO>>> Handle(GetWorkAssignmentListQuery request, CancellationToken cancellationToken)
         {
             try
             {
@@ -28,13 +29,13 @@ namespace TaskTracker.API.Application.Queries
                 {
                     collection = await _workRepository.GetCollectionAsync(request.Offset, request.Limit, request.OnlyHeadTasks, cancellationToken);
                 }
-                return new GetWorkAssignmentListQueryResponse(collection.Select(x => x.ToWorkAssignmentDto()).ToList());
+                return new ApiResponseBase<List<WorkAssignmentDTO>>(collection.Select(x => x.ToWorkAssignmentDto()).ToList());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unable to get work assignment list.");
             }
-            return new GetWorkAssignmentListQueryResponse(null);
+            return new ApiResponseBase<List<WorkAssignmentDTO>>(false, System.Net.HttpStatusCode.InternalServerError);
         }
     }
 }

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TaskTracker.API.Application.Commands
 {
-    public class ClearHeadWorkAssignmentCommand : IRequest<ClearHeadWorkAssignmentCommandResponse>
+    public class ClearHeadWorkAssignmentCommand : IRequest<ApiResponseBase>
     {
         /// <summary>
         /// Идентификатор подзадачи.
@@ -11,6 +11,4 @@ namespace TaskTracker.API.Application.Commands
         [Required]
         public int Id { get; set; }
     }
-
-    public record ClearHeadWorkAssignmentCommandResponse(bool Success) : ApiResponseBase(Success);
 }

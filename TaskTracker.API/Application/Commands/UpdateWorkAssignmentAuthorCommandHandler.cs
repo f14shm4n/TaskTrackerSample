@@ -3,7 +3,7 @@ using TaskTracker.Domain.Aggregates.WorkAssignment;
 
 namespace TaskTracker.API.Application.Commands
 {
-    public class UpdateWorkAssignmentAuthorCommandHandler : IRequestHandler<UpdateWorkAssignmentAuthorCommand, UpdateWorkAssignmentAuthorCommandResponse>
+    public class UpdateWorkAssignmentAuthorCommandHandler : IRequestHandler<UpdateWorkAssignmentAuthorCommand, ApiResponseBase>
     {
         private readonly ILogger<UpdateWorkAssignmentAuthorCommandHandler> _logger;
         private readonly IWorkAssignmentRepository _workRepository;
@@ -14,23 +14,25 @@ namespace TaskTracker.API.Application.Commands
             _workRepository = taskRepository;
         }
 
-        public async Task<UpdateWorkAssignmentAuthorCommandResponse> Handle(UpdateWorkAssignmentAuthorCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseBase> Handle(UpdateWorkAssignmentAuthorCommand request, CancellationToken cancellationToken)
         {
             try
             {
                 var entity = await _workRepository.GetAsync(request.Id, cancellationToken);
-                if (entity is not null)
+                if (entity is null)
                 {
-                    entity.SetAuthor(request.NewAuthor);
-                    var r = await _workRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
-                    return new UpdateWorkAssignmentAuthorCommandResponse(r > 0);
+                    return new ApiResponseBase("The task does not exists.", System.Net.HttpStatusCode.BadRequest);
                 }
+
+                entity.SetAuthor(request.NewAuthor);
+                await _workRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
+                return new ApiResponseBase(true);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unable to update work assignment author. WorkAssignmentId: '{Id}', NewAuthor: '{Authro}'", request.Id, request.NewAuthor);
+                _logger.LogError(ex, "Unable to update work assignment author. WorkAssignmentId: '{Id}', NewAuthor: '{Author}'", request.Id, request.NewAuthor);
             }
-            return new UpdateWorkAssignmentAuthorCommandResponse(false);
+            return new ApiResponseBase(false, System.Net.HttpStatusCode.InternalServerError);
         }
-    }    
+    }
 }

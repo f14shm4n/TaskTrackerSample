@@ -3,7 +3,7 @@ using TaskTracker.Domain.Aggregates.WorkAssignment;
 
 namespace TaskTracker.API.Application.Commands
 {
-    public class UpdateWorkAssignmentWorkerCommandHandler : IRequestHandler<UpdateWorkAssignmentWorkerCommand, UpdateWorkAssignmentWorkerCommandResponse>
+    public class UpdateWorkAssignmentWorkerCommandHandler : IRequestHandler<UpdateWorkAssignmentWorkerCommand, ApiResponseBase>
     {
         private readonly ILogger<UpdateWorkAssignmentWorkerCommandHandler> _logger;
         private readonly IWorkAssignmentRepository _workRepository;
@@ -14,24 +14,26 @@ namespace TaskTracker.API.Application.Commands
             _workRepository = taskRepository;
         }
 
-        public async Task<UpdateWorkAssignmentWorkerCommandResponse> Handle(UpdateWorkAssignmentWorkerCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseBase> Handle(UpdateWorkAssignmentWorkerCommand request, CancellationToken cancellationToken)
         {
             try
             {
                 var entity = await _workRepository.GetAsync(request.Id, cancellationToken);
-                if (entity is not null)
+                if (entity is null)
                 {
-                    if (request.NewWorker is null || request.NewWorker.Length == 0)
-                    {
-                        entity.ClearWorker();
-                    }
-                    else
-                    {
-                        entity.SetWorker(request.NewWorker);
-                    }
-                    var r = await _workRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
-                    return new UpdateWorkAssignmentWorkerCommandResponse(r > 0);
+                    return new ApiResponseBase("The task does not exits.", System.Net.HttpStatusCode.BadRequest);
                 }
+
+                if (request.NewWorker is null || request.NewWorker.Length == 0)
+                {
+                    entity.ClearWorker();
+                }
+                else
+                {
+                    entity.SetWorker(request.NewWorker);
+                }
+                await _workRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
+                return new ApiResponseBase(true);
             }
             catch (Exception ex)
             {
@@ -44,7 +46,7 @@ namespace TaskTracker.API.Application.Commands
                     _logger.LogError(ex, "Unable to update work assignment worker. WorkAssignmentId: '{Id}', NewWorker: '{Worker}'", request.Id, request.NewWorker);
                 }
             }
-            return new UpdateWorkAssignmentWorkerCommandResponse(false);
+            return new ApiResponseBase(false, System.Net.HttpStatusCode.InternalServerError);
         }
     }
 }

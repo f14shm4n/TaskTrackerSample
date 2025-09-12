@@ -1,12 +1,11 @@
 ﻿using MediatR;
 using TaskTracker.API.Application.Dto;
 using TaskTracker.API.Application.Extensions;
-using TaskTracker.Domain.Abstractions;
 using TaskTracker.Domain.Aggregates.WorkAssignment;
 
 namespace TaskTracker.API.Application.Commands
 {
-    public class CreateWorkAssignmentCommandHandler : IRequestHandler<CreateWorkAssignmentCommand, CreateWorkAssignmentCommandResponse>
+    public class CreateWorkAssignmentCommandHandler : IRequestHandler<CreateWorkAssignmentCommand, ApiResponseBase<WorkAssignmentDTO>>
     {
         private readonly ILogger<CreateWorkAssignmentCommandHandler> _logger;
         private readonly IWorkAssignmentRepository _workRepository;
@@ -17,24 +16,20 @@ namespace TaskTracker.API.Application.Commands
             _workRepository = taskRepository;
         }
 
-        public async Task<CreateWorkAssignmentCommandResponse> Handle(CreateWorkAssignmentCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseBase<WorkAssignmentDTO>> Handle(CreateWorkAssignmentCommand request, CancellationToken cancellationToken)
         {
-            CreateWorkAssignmentCommandResponse response;
             try
             {
                 var entity = request.ToWorkAssignment();
-
                 _workRepository.Add(entity);
                 await _workRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
-
-                response = new CreateWorkAssignmentCommandResponse(entity.ToWorkAssignmentDto());
+                return new ApiResponseBase<WorkAssignmentDTO>(entity.ToWorkAssignmentDto());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unable to add new work assignment to the data base.");
-                response = new CreateWorkAssignmentCommandResponse(null);
             }
-            return response;
+            return new ApiResponseBase<WorkAssignmentDTO>(false, System.Net.HttpStatusCode.InternalServerError);
         }
     }
 }

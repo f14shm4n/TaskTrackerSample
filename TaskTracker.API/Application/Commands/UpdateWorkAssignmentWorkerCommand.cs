@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TaskTracker.API.Application.Commands
 {
-    public class UpdateWorkAssignmentWorkerCommand : IRequest<UpdateWorkAssignmentWorkerCommandResponse>
+    public class UpdateWorkAssignmentWorkerCommand : IRequest<ApiResponseBase>
     {
         /// <summary>
         /// Идентификатор задачи.
@@ -15,6 +15,4 @@ namespace TaskTracker.API.Application.Commands
         /// </summary>
         public string? NewWorker { get; set; }
     }
-
-    public record UpdateWorkAssignmentWorkerCommandResponse(bool Success) : ApiResponseBase(Success);
 }

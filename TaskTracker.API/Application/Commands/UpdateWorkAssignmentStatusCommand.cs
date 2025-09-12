@@ -4,7 +4,7 @@ using TaskTracker.Domain.Aggregates.WorkAssignment;
 
 namespace TaskTracker.API.Application.Commands
 {
-    public class UpdateWorkAssignmentStatusCommand : IRequest<UpdateWorkAssignmentStatusCommandResponse>
+    public class UpdateWorkAssignmentStatusCommand : IRequest<ApiResponseBase>
     {
         /// <summary>
         /// Идентификатор задачи.
@@ -17,6 +17,4 @@ namespace TaskTracker.API.Application.Commands
         [Required]
         public WorkAssignmentStatus NewStatus { get; set; }
     }
-
-    public record UpdateWorkAssignmentStatusCommandResponse(bool Success) : ApiResponseBase(Success);
 }

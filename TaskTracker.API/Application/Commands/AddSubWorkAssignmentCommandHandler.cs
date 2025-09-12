@@ -3,7 +3,7 @@ using TaskTracker.Domain.Aggregates.WorkAssignment;
 
 namespace TaskTracker.API.Application.Commands
 {
-    public class AddSubWorkAssignmentCommandHandler : IRequestHandler<AddSubWorkAssignmentCommand, AddSubWorkAssignmentCommandResponse>
+    public class AddSubWorkAssignmentCommandHandler : IRequestHandler<AddSubWorkAssignmentCommand, ApiResponseBase>
     {
         private readonly ILogger<AddSubWorkAssignmentCommandHandler> _logger;
         private readonly IWorkAssignmentRepository _workRepository;
@@ -14,39 +14,40 @@ namespace TaskTracker.API.Application.Commands
             _workRepository = taskRepository;
         }
 
-        public async Task<AddSubWorkAssignmentCommandResponse> Handle(AddSubWorkAssignmentCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseBase> Handle(AddSubWorkAssignmentCommand request, CancellationToken cancellationToken)
         {
             try
             {
                 // This check can be moved to Validation attribute to the command.
                 if (request.WorkAssignmentId == request.SubWorkAssignmentId)
                 {
-                    return Fail();
+                    return new ApiResponseBase("A task cannot be a subtask of itself.", System.Net.HttpStatusCode.BadRequest);
                 }
 
                 if (!await _workRepository.ContainsAsync(request.WorkAssignmentId, cancellationToken))
                 {
-                    return Fail();
+                    return new ApiResponseBase($"A task with {nameof(request.WorkAssignmentId)}: '{request.WorkAssignmentId}' not exists.", System.Net.HttpStatusCode.BadRequest);
                 }
 
                 var subWork = await _workRepository.GetAsync(request.SubWorkAssignmentId, cancellationToken);
                 if (subWork is null)
                 {
-                    return Fail();
+                    return new ApiResponseBase($"A task with {nameof(request.SubWorkAssignmentId)}: '{request.SubWorkAssignmentId}' not exists.", System.Net.HttpStatusCode.BadRequest);
+                }
+                if (subWork.HeadAssignemtId == request.WorkAssignmentId)
+                {
+                    return new ApiResponseBase("The task is already a subtask of the specified task.", System.Net.HttpStatusCode.BadRequest);
                 }
 
                 subWork.SetHeadAssignment(request.WorkAssignmentId);
-                var r = await _workRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
-                return r > 0 ? Success() : Fail();
+                await _workRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
+                return new ApiResponseBase(true);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unable to add sub work Assignment. WorkAssignmentId: '{HID}', SubWorkAssignmentId: '{SID}'", request.WorkAssignmentId, request.SubWorkAssignmentId);
             }
-            return Fail();
-
-            static AddSubWorkAssignmentCommandResponse Fail() => new(false);
-            static AddSubWorkAssignmentCommandResponse Success() => new(true);
+            return new ApiResponseBase(false, System.Net.HttpStatusCode.InternalServerError);
         }
     }
 }

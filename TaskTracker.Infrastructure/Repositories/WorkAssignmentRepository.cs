@@ -41,7 +41,7 @@ namespace TaskTracker.Infrastructure.Repositories
 
                     await _context.WorkAssignments
                         .Where(x => x.HeadAssignemtId == id)
-                        .ExecuteUpdateAsync(setters => setters.SetProperty(x => x.HeadAssignemtId, (int?)null));
+                        .ExecuteUpdateAsync(setters => setters.SetProperty(x => x.HeadAssignemtId, (int?)null), cancellationToken);
 
                     rCount = await _context.WorkAssignments.Where(x => x.Id == id).ExecuteDeleteAsync(cancellationToken);
 

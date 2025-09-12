@@ -3,7 +3,7 @@ using TaskTracker.API.Application.Dto;
 
 namespace TaskTracker.API.Application.Queries
 {
-    public class GetWorkAssignmentListQuery : IRequest<GetWorkAssignmentListQueryResponse>
+    public class GetWorkAssignmentListQuery : IRequest<ApiResponseBase<List<WorkAssignmentDTO>>>
     {
         /// <summary>
         /// Determines whether the related data of the task should be retrieved.
@@ -22,6 +22,4 @@ namespace TaskTracker.API.Application.Queries
         /// </summary>
         public int Limit { get; set; } = 10;
     }
-
-    public record GetWorkAssignmentListQueryResponse(List<WorkAssignmentDTO>? TaskList) : ApiResponseBase(TaskList is not null);
 }

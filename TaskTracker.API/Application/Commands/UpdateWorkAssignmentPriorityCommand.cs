@@ -4,7 +4,7 @@ using TaskTracker.Domain.Aggregates.WorkAssignment;
 
 namespace TaskTracker.API.Application.Commands
 {
-    public class UpdateWorkAssignmentPriorityCommand : IRequest<UpdateWorkAssignmentPriorityCommandResponse>
+    public class UpdateWorkAssignmentPriorityCommand : IRequest<ApiResponseBase>
     {
         /// <summary>
         /// Идентификатор задачи.
@@ -17,6 +17,4 @@ namespace TaskTracker.API.Application.Commands
         [Required]
         public WorkAssignmentPriority NewPriority { get; set; }
     }
-
-    public record UpdateWorkAssignmentPriorityCommandResponse(bool Success) : ApiResponseBase(Success);
 }

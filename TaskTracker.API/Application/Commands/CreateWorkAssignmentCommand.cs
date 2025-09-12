@@ -6,7 +6,7 @@ using TaskTracker.Domain.Aggregates.WorkAssignment;
 
 namespace TaskTracker.API.Application.Commands
 {
-    public class CreateWorkAssignmentCommand : IRequest<CreateWorkAssignmentCommandResponse>
+    public class CreateWorkAssignmentCommand : IRequest<ApiResponseBase<WorkAssignmentDTO>>
     {
         /// <summary>
         /// Заголовок задачи.
@@ -32,6 +32,4 @@ namespace TaskTracker.API.Application.Commands
         /// </summary>
         public string? Worker { get; set; }
     }
-
-    public record CreateWorkAssignmentCommandResponse(WorkAssignmentDTO? TaskInfo) : ApiResponseBase(TaskInfo is not null);
 }

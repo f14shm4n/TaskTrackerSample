@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using TaskTracker.API.Application;
 using TaskTracker.API.Application.Commands;
+using TaskTracker.API.Application.Dto;
 using TaskTracker.API.Application.Queries;
 
 namespace TaskTracker.API.Controllers
@@ -11,6 +13,8 @@ namespace TaskTracker.API.Controllers
     [ApiController]
     [Route("[controller]")]
     [Produces("application/json")]
+    [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.Unauthorized)]
+    [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.InternalServerError)]
     public class TaskTrackerController : ControllerBase
     {
         private readonly ILogger<TaskTrackerController> _logger;
@@ -27,11 +31,12 @@ namespace TaskTracker.API.Controllers
         /// </summary>
         /// <param name="command"></param>
         /// <returns>Объект содержащий созданную задачу.</returns>
+        /// <response code="200">Возвращается если задача создана.</response>
         [HttpPost("create-task")]
-        [ProducesResponseType(typeof(CreateWorkAssignmentCommandResponse), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<CreateWorkAssignmentCommandResponse>> CreateTask([FromBody] CreateWorkAssignmentCommand command)
+        [ProducesResponseType(typeof(ApiResponseBase<WorkAssignmentDTO>), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<ApiResponseBase<WorkAssignmentDTO>>> CreateTask([FromBody] CreateWorkAssignmentCommand command)
         {
-            return await _mediator.Send(command);
+            return this.ToActionResultResult(await _mediator.Send(command));
         }
 
         /// <summary>
@@ -42,16 +47,11 @@ namespace TaskTracker.API.Controllers
         /// <response code="200">Возвращается если задача найдена</response>
         /// <response code="404">Возвращается если задача не найдена.</response>
         [HttpGet("get-task")]
-        [ProducesResponseType(typeof(GetWorkAssignmentByIdQueryResponse), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<GetWorkAssignmentByIdQueryResponse>> GetTask([FromQuery] GetWorkAssignmentByIdQuery query)
+        [ProducesResponseType(typeof(ApiResponseBase<WorkAssignmentDTO>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponseBase<WorkAssignmentDTO>), (int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ApiResponseBase<WorkAssignmentDTO>>> GetTask([FromQuery] GetWorkAssignmentByIdQuery query)
         {
-            var rsp = await _mediator.Send(query);
-            if (rsp.TaskInfo is null)
-            {
-                return NotFound();
-            }
-            return rsp;
+            return this.ToActionResultResult(await _mediator.Send(query));
         }
 
         /// <summary>
@@ -60,10 +60,10 @@ namespace TaskTracker.API.Controllers
         /// <param name="query"></param>
         /// <returns>Объект содержащий список с задачами.</returns>
         [HttpGet("get-tasks")]
-        [ProducesResponseType(typeof(GetWorkAssignmentByIdQueryResponse), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<GetWorkAssignmentListQueryResponse>> GetTasks([FromQuery] GetWorkAssignmentListQuery query)
+        [ProducesResponseType(typeof(ApiResponseBase<List<WorkAssignmentDTO>>), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<ApiResponseBase<List<WorkAssignmentDTO>>>> GetTasks([FromQuery] GetWorkAssignmentListQuery query)
         {
-            return await _mediator.Send(query);
+            return this.ToActionResultResult(await _mediator.Send(query));
         }
 
         /// <summary>
@@ -71,11 +71,12 @@ namespace TaskTracker.API.Controllers
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>    
+        /// <response code="200">Возвращается если запрос выполнен без сбоев.</response>
         [HttpDelete("delete-task")]
-        [ProducesResponseType(typeof(DeleteWorkAssignmentCommandResponse), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<DeleteWorkAssignmentCommandResponse>> DeleteTask([FromQuery] DeleteWorkAssignmentCommand command)
+        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<ApiResponseBase>> DeleteTask([FromQuery] DeleteWorkAssignmentCommand command)
         {
-            return await _mediator.Send(command);
+            return this.ToActionResultResult(await _mediator.Send(command));
         }
 
         /// <summary>
@@ -83,23 +84,26 @@ namespace TaskTracker.API.Controllers
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
+        /// <response code="200">Возвращается в случае успешного выполнения.</response>
+        /// <response code="400">Возвращается в случае, если данные запроса были некорректны. См. детали в объекте-результата запроса.</response>
         [HttpPut("update-task-status")]
-        [ProducesResponseType(typeof(UpdateWorkAssignmentStatusCommandResponse), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<UpdateWorkAssignmentStatusCommandResponse>> UpdateTaskStatus([FromBody] UpdateWorkAssignmentStatusCommand command)
+        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<ApiResponseBase>> UpdateTaskStatus([FromBody] UpdateWorkAssignmentStatusCommand command)
         {
-            return await _mediator.Send(command);
+            return this.ToActionResultResult(await _mediator.Send(command));
         }
 
         /// <summary>
         /// Устанавливает новый приоритет задачи.
         /// </summary>
         /// <param name="command"></param>
-        /// <returns></returns>
+        /// <response code="200">Возвращается в случае успешного выполнения.</response>
+        /// <response code="400">Возвращается в случае, если данные запроса были некорректны. См. детали в объекте-результата запроса.</response>
         [HttpPut("update-task-priority")]
-        [ProducesResponseType(typeof(UpdateWorkAssignmentPriorityCommandResponse), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<UpdateWorkAssignmentPriorityCommandResponse>> UpdateTaskPriority([FromBody] UpdateWorkAssignmentPriorityCommand command)
+        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<ApiResponseBase>> UpdateTaskPriority([FromBody] UpdateWorkAssignmentPriorityCommand command)
         {
-            return await _mediator.Send(command);
+            return this.ToActionResultResult(await _mediator.Send(command));
         }
 
         /// <summary>
@@ -107,11 +111,13 @@ namespace TaskTracker.API.Controllers
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
+        /// <response code="200">Возвращается в случае успешного выполнения.</response>
+        /// <response code="400">Возвращается в случае, если данные запроса были некорректны. См. детали в объекте-результата запроса.</response>
         [HttpPut("update-task-author")]
-        [ProducesResponseType(typeof(UpdateWorkAssignmentAuthorCommandResponse), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<UpdateWorkAssignmentAuthorCommandResponse>> UpdateTaskAuthor([FromBody] UpdateWorkAssignmentAuthorCommand command)
+        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<ApiResponseBase>> UpdateTaskAuthor([FromBody] UpdateWorkAssignmentAuthorCommand command)
         {
-            return await _mediator.Send(command);
+            return this.ToActionResultResult(await _mediator.Send(command));
         }
 
         /// <summary>
@@ -119,11 +125,13 @@ namespace TaskTracker.API.Controllers
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
+        /// <response code="200">Возвращается в случае успешного выполнения.</response>
+        /// <response code="400">Возвращается в случае, если данные запроса были некорректны. См. детали в объекте-результата запроса.</response>
         [HttpPut("update-task-worker")]
-        [ProducesResponseType(typeof(UpdateWorkAssignmentWorkerCommandResponse), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<UpdateWorkAssignmentWorkerCommandResponse>> UpdateTaskWorker([FromBody] UpdateWorkAssignmentWorkerCommand command)
+        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<ApiResponseBase>> UpdateTaskWorker([FromBody] UpdateWorkAssignmentWorkerCommand command)
         {
-            return await _mediator.Send(command);
+            return this.ToActionResultResult(await _mediator.Send(command));
         }
 
         /// <summary>
@@ -131,11 +139,14 @@ namespace TaskTracker.API.Controllers
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
+        /// <response code="200">Возвращается в случае успешного выполнения.</response>
+        /// <response code="400">Возвращается в случае, если данные запроса были некорректны. См. детали в объекте-результата запроса.</response>
         [HttpPut("add-sub-task")]
-        [ProducesResponseType(typeof(AddSubWorkAssignmentCommandResponse), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<AddSubWorkAssignmentCommandResponse>> AddSubTask([FromBody] AddSubWorkAssignmentCommand command)
+        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<ApiResponseBase>> AddSubTask([FromBody] AddSubWorkAssignmentCommand command)
         {
-            return await _mediator.Send(command);
+            return this.ToActionResultResult(await _mediator.Send(command));
         }
 
         /// <summary>
@@ -143,11 +154,13 @@ namespace TaskTracker.API.Controllers
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
+        /// <response code="200">Возвращается в случае успешного выполнения.</response>
+        /// <response code="400">Возвращается в случае, если данные запроса были некорректны. См. детали в объекте-результата запроса.</response>
         [HttpPut("clear-master-task")]
-        [ProducesResponseType(typeof(ClearHeadWorkAssignmentCommandResponse), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<ClearHeadWorkAssignmentCommandResponse>> ClearMasterTask([FromBody] ClearHeadWorkAssignmentCommand command)
+        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<ApiResponseBase>> ClearMasterTask([FromBody] ClearHeadWorkAssignmentCommand command)
         {
-            return await _mediator.Send(command);
+            return this.ToActionResultResult(await _mediator.Send(command));
         }
 
         /// <summary>
@@ -155,11 +168,14 @@ namespace TaskTracker.API.Controllers
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
+        /// <response code="200">Возвращается в случае успешного выполнения.</response>
+        /// <response code="400">Возвращается в случае, если данные запроса были некорректны. См. детали в объекте-результата запроса.</response>
         [HttpPut("set-relation")]
-        [ProducesResponseType(typeof(AddWorkAssignmentRelationCommandResponse), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<AddWorkAssignmentRelationCommandResponse>> SetRelation([FromBody] AddWorkAssignmentRelationCommand command)
+        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<ApiResponseBase>> SetRelation([FromBody] AddWorkAssignmentRelationCommand command)
         {
-            return await _mediator.Send(command);
+            return this.ToActionResultResult(await _mediator.Send(command));
         }
 
         /// <summary>
@@ -167,11 +183,14 @@ namespace TaskTracker.API.Controllers
         /// </summary>
         /// <param name="command"></param>
         /// <returns></returns>
+        /// <response code="200">Возвращается в случае успешного выполнения.</response>
+        /// <response code="400">Возвращается в случае, если данные запроса были некорректны. См. детали в объекте-результата запроса.</response>
         [HttpPut("remove-relation")]
-        [ProducesResponseType(typeof(RemoveWorkAssignmentRelationCommandResponse), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<RemoveWorkAssignmentRelationCommandResponse>> RemoveRelation([FromBody] RemoveWorkAssignmentRelationCommand command)
+        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<ApiResponseBase>> RemoveRelation([FromBody] RemoveWorkAssignmentRelationCommand command)
         {
-            return await _mediator.Send(command);
+            return this.ToActionResultResult(await _mediator.Send(command));
         }
     }
 }

@@ -3,7 +3,7 @@ using TaskTracker.Domain.Aggregates.WorkAssignment;
 
 namespace TaskTracker.API.Application.Commands
 {
-    public class DeleteWorkAssignmentCommandHandler : IRequestHandler<DeleteWorkAssignmentCommand, DeleteWorkAssignmentCommandResponse>
+    public class DeleteWorkAssignmentCommandHandler : IRequestHandler<DeleteWorkAssignmentCommand, ApiResponseBase>
     {
         private readonly ILogger<DeleteWorkAssignmentCommandHandler> _logger;
         private readonly IWorkAssignmentRepository _workRepository;
@@ -14,19 +14,18 @@ namespace TaskTracker.API.Application.Commands
             _workRepository = taskRepository;
         }
 
-        public async Task<DeleteWorkAssignmentCommandResponse> Handle(DeleteWorkAssignmentCommand request, CancellationToken cancellationToken)
+        public async Task<ApiResponseBase> Handle(DeleteWorkAssignmentCommand request, CancellationToken cancellationToken)
         {
-            DeleteWorkAssignmentCommandResponse response;
             try
             {
-                response = new DeleteWorkAssignmentCommandResponse(await _workRepository.DeleteAsync(request.Id, cancellationToken));
+                await _workRepository.DeleteAsync(request.Id, cancellationToken);
+                return new ApiResponseBase(true);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unable to delete work assignment. WorkAssignmentId: '{Id}'.", request.Id);
-                response = new DeleteWorkAssignmentCommandResponse(false);
             }
-            return response;
+            return new ApiResponseBase(false, System.Net.HttpStatusCode.InternalServerError);
         }
     }
 }
