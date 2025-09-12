@@ -13,8 +13,8 @@ namespace TaskTracker.API.Controllers
                 HttpStatusCode.OK => controller.Ok(response),
                 HttpStatusCode.BadRequest => controller.BadRequest(response),
                 HttpStatusCode.NotFound => controller.NotFound(response),
-                HttpStatusCode.InternalServerError => controller.StatusCode((int)response.StatusCode, response),
-                _ => throw new NotImplementedException($"Not supported status code. HttpStatusCode: '{response.StatusCode}'"),
+                not null => controller.StatusCode((int)response.StatusCode, response),
+                _ => throw new InvalidOperationException("The HTTP status code must be set."),
             };
         }
     }
