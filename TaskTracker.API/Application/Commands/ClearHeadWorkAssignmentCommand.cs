@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
 namespace TaskTracker.API.Application.Commands
@@ -9,6 +10,7 @@ namespace TaskTracker.API.Application.Commands
         /// Идентификатор подзадачи.
         /// </summary>
         [Required]
+        [FromRoute(Name = "id")]
         public int Id { get; set; }
     }
 }

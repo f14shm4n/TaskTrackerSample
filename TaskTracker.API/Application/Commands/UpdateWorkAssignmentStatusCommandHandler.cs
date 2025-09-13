@@ -24,13 +24,13 @@ namespace TaskTracker.API.Application.Commands
                     return new ApiResponseBase("The task does not exits.", System.Net.HttpStatusCode.BadRequest);
                 }
 
-                entity.SetStatus(request.NewStatus);
+                entity.SetStatus(request.Status);
                 await _workRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
                 return new ApiResponseBase(true);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unable to update work assignment status. WorkAssignmentId: '{Id}' and NewStatus: '{Status}'", request.Id, request.NewStatus);
+                _logger.LogError(ex, "Unable to update work assignment status. WorkAssignmentId: '{Id}' and NewStatus: '{Status}'", request.Id, request.Status);
             }
             return new ApiResponseBase(false, System.Net.HttpStatusCode.InternalServerError);
         }

@@ -24,26 +24,26 @@ namespace TaskTracker.API.Application.Commands
                     return new ApiResponseBase("The task does not exits.", System.Net.HttpStatusCode.BadRequest);
                 }
 
-                if (request.NewWorker is null || request.NewWorker.Length == 0)
+                if (request.Worker is null || request.Worker.Length == 0)
                 {
                     entity.ClearWorker();
                 }
                 else
                 {
-                    entity.SetWorker(request.NewWorker);
+                    entity.SetWorker(request.Worker);
                 }
                 await _workRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
                 return new ApiResponseBase(true);
             }
             catch (Exception ex)
             {
-                if (request.NewWorker is null || request.NewWorker.Length == 0)
+                if (request.Worker is null || request.Worker.Length == 0)
                 {
                     _logger.LogError(ex, "Unable to recall work assignment worker. WorkAssignmentId: '{Id}'", request.Id);
                 }
                 else
                 {
-                    _logger.LogError(ex, "Unable to update work assignment worker. WorkAssignmentId: '{Id}', NewWorker: '{Worker}'", request.Id, request.NewWorker);
+                    _logger.LogError(ex, "Unable to update work assignment worker. WorkAssignmentId: '{Id}', NewWorker: '{Worker}'", request.Id, request.Worker);
                 }
             }
             return new ApiResponseBase(false, System.Net.HttpStatusCode.InternalServerError);

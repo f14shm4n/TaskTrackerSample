@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using TaskTracker.API.Application.Dto;
 
 namespace TaskTracker.API.Application.Queries
@@ -8,6 +9,7 @@ namespace TaskTracker.API.Application.Queries
         /// <summary>
         /// Идентификатор задачи, которую нужно получить.
         /// </summary>
+        [FromRoute(Name = "id")]
         public int Id { get; set; }
     }
 }

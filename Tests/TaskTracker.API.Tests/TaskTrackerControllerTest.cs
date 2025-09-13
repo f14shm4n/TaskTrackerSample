@@ -7,6 +7,7 @@ using System.Text.Json.Serialization;
 using TaskTracker.API.Application;
 using TaskTracker.API.Application.Commands;
 using TaskTracker.API.Application.Dto;
+using TaskTracker.API.Controllers;
 using TaskTracker.Domain.Aggregates.WorkAssignment;
 
 namespace TaskTracker.API.Tests
@@ -31,7 +32,7 @@ namespace TaskTracker.API.Tests
 
             await DoWorkAsync(async sp =>
             {
-                var rsp = await client.PostAsJsonAsync("/TaskTracker/create-task", GetCreateTaskCommand());
+                var rsp = await client.PostAsJsonAsync($"/{WorkAssignmentController.RootRoute}", GetCreateTaskCommand());
                 var rspData = await rsp.Content.ReadFromJsonAsync<ApiResponseBase<WorkAssignmentDTO>>(_jsonOptions);
                 rspData.Should().NotBeNull();
                 rspData.Payload.Should().NotBeNull();
@@ -50,7 +51,7 @@ namespace TaskTracker.API.Tests
                 var mediator = sp.GetRequiredService<IMediator>();
                 var taskData = await mediator.Send(GetCreateTaskCommand());
 
-                var rsp = await client.DeleteAsync($"/TaskTracker/delete-task?id={taskData.Payload!.Id}");
+                var rsp = await client.DeleteAsync($"/{WorkAssignmentController.RootRoute}/{taskData.Payload!.Id}");
                 var rspData = await rsp.Content.ReadFromJsonAsync<ApiResponseBase>();
                 rspData.Should().NotBeNull();
                 rspData.Success.Should().BeTrue();
@@ -67,7 +68,7 @@ namespace TaskTracker.API.Tests
                 var mediator = sp.GetRequiredService<IMediator>();
                 var taskData = await mediator.Send(GetCreateTaskCommand());
 
-                var rsp = await client.PutAsJsonAsync("/TaskTracker/update-task-status", new UpdateWorkAssignmentStatusCommand { Id = taskData.Payload!.Id, NewStatus = WorkAssignmentStatus.InProgress });
+                var rsp = await client.PutAsync($"/{WorkAssignmentController.RootRoute}/{taskData.Payload!.Id}/status/{WorkAssignmentStatus.InProgress}", null);
                 var rspData = await rsp.Content.ReadFromJsonAsync<ApiResponseBase>();
                 rspData.Should().NotBeNull();
                 rspData.Success.Should().BeTrue();
@@ -86,7 +87,7 @@ namespace TaskTracker.API.Tests
                 var mediator = sp.GetRequiredService<IMediator>();
                 var taskData = await mediator.Send(GetCreateTaskCommand());
 
-                var rsp = await client.PutAsJsonAsync("/TaskTracker/update-task-priority", new UpdateWorkAssignmentPriorityCommand { Id = taskData.Payload!.Id, NewPriority = WorkAssignmentPriority.Medium });
+                var rsp = await client.PutAsync($"/{WorkAssignmentController.RootRoute}/{taskData.Payload!.Id}/priority/{WorkAssignmentPriority.Medium}", null);
                 var rspData = await rsp.Content.ReadFromJsonAsync<ApiResponseBase>();
                 rspData.Should().NotBeNull();
                 rspData.Success.Should().BeTrue();
@@ -105,7 +106,7 @@ namespace TaskTracker.API.Tests
                 var mediator = sp.GetRequiredService<IMediator>();
                 var taskData = await mediator.Send(GetCreateTaskCommand());
 
-                var rsp = await client.PutAsJsonAsync("/TaskTracker/update-task-author", new UpdateWorkAssignmentAuthorCommand { Id = taskData.Payload!.Id, NewAuthor = "Sergey" });
+                var rsp = await client.PutAsync($"/{WorkAssignmentController.RootRoute}/{taskData.Payload!.Id}/author/Sergey", null);
                 var rspData = await rsp.Content.ReadFromJsonAsync<ApiResponseBase>();
                 rspData.Should().NotBeNull();
                 rspData.Success.Should().BeTrue();
@@ -119,8 +120,6 @@ namespace TaskTracker.API.Tests
         [InlineData(null, "Ivan")]
         [InlineData("", "Ivan")]
         [InlineData("Petya", "Ivan")]
-        [InlineData("Vasya", "")]
-        [InlineData("Vasya", null)]
         public async Task UpdateWorkAssignmentWorker(string? oldWorker, string? newWorker)
         {
             var client = await CreateClientWithJwt();
@@ -130,7 +129,26 @@ namespace TaskTracker.API.Tests
                 var mediator = sp.GetRequiredService<IMediator>();
                 var taskData = await mediator.Send(GetCreateTaskCommand(worker: oldWorker));
 
-                var rsp = await client.PutAsJsonAsync("/TaskTracker/update-task-worker", new UpdateWorkAssignmentWorkerCommand { Id = taskData.Payload!.Id, NewWorker = newWorker });
+                var rsp = await client.PutAsync($"/{WorkAssignmentController.RootRoute}/{taskData.Payload!.Id}/worker/{newWorker}", null);
+                var rspData = await rsp.Content.ReadFromJsonAsync<ApiResponseBase>();
+                rspData.Should().NotBeNull();
+                rspData.Success.Should().BeTrue();
+
+                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData.Payload!.Id });
+            });
+        }
+
+        [Fact]
+        public async Task RemoveWorkAssignmentWorker()
+        {
+            var client = await CreateClientWithJwt();
+
+            await DoWorkAsync(async sp =>
+            {
+                var mediator = sp.GetRequiredService<IMediator>();
+                var taskData = await mediator.Send(GetCreateTaskCommand(worker: "Vasya"));
+
+                var rsp = await client.PutAsync($"/{WorkAssignmentController.RootRoute}/{taskData.Payload!.Id}/worker/unset", null);
                 var rspData = await rsp.Content.ReadFromJsonAsync<ApiResponseBase>();
                 rspData.Should().NotBeNull();
                 rspData.Success.Should().BeTrue();
@@ -150,7 +168,7 @@ namespace TaskTracker.API.Tests
                 var taskData1 = await mediator.Send(GetCreateTaskCommand(title: "Master task #1"));
                 var taskData2 = await mediator.Send(GetCreateTaskCommand(title: "Sub task #1-1"));
 
-                var rsp = await client.PutAsJsonAsync("/TaskTracker/add-sub-task", new AddSubWorkAssignmentCommand { WorkAssignmentId = taskData1.Payload!.Id, SubWorkAssignmentId = taskData2.Payload!.Id });
+                var rsp = await client.PutAsync($"/{WorkAssignmentController.RootRoute}/{taskData1.Payload!.Id}/nesting/{taskData2.Payload!.Id}", null);
                 var rspData = await rsp.Content.ReadFromJsonAsync<ApiResponseBase>();
                 rspData.Should().NotBeNull();
                 rspData.Success.Should().BeTrue();
@@ -172,7 +190,7 @@ namespace TaskTracker.API.Tests
                 var taskData2 = await mediator.Send(GetCreateTaskCommand(title: "Sub task #1-1"));
                 await mediator.Send(new AddSubWorkAssignmentCommand { WorkAssignmentId = taskData1.Payload!.Id, SubWorkAssignmentId = taskData2.Payload!.Id });
 
-                var rsp = await client.PutAsJsonAsync("/TaskTracker/clear-master-task", new ClearHeadWorkAssignmentCommand { Id = taskData2.Payload!.Id });
+                var rsp = await client.PutAsync($"/{WorkAssignmentController.RootRoute}/{taskData2.Payload!.Id}/unnesting", null);
                 var rspData = await rsp.Content.ReadFromJsonAsync<ApiResponseBase>();
                 rspData.Should().NotBeNull();
                 rspData.Success.Should().BeTrue();
@@ -193,7 +211,7 @@ namespace TaskTracker.API.Tests
                 var taskData1 = await mediator.Send(GetCreateTaskCommand(title: "Task #1"));
                 var taskData2 = await mediator.Send(GetCreateTaskCommand(title: "Task #2"));
 
-                var rsp = await client.PutAsJsonAsync("/TaskTracker/set-relation", new AddWorkAssignmentRelationCommand { Relation = WorkAssignmentRelationType.RelativeTo, SourceId = taskData1.Payload!.Id, TargetId = taskData2.Payload!.Id });
+                var rsp = await client.PutAsync($"/{WorkAssignmentController.RootRoute}/{taskData1.Payload!.Id}/relate/{taskData2.Payload!.Id}/{WorkAssignmentRelationType.RelativeTo}", null);
                 var rspData = await rsp.Content.ReadFromJsonAsync<ApiResponseBase>();
                 rspData.Should().NotBeNull();
                 rspData.Success.Should().BeTrue();
@@ -215,7 +233,7 @@ namespace TaskTracker.API.Tests
                 var taskData2 = await mediator.Send(GetCreateTaskCommand(title: "Task #2"));
                 await mediator.Send(new AddWorkAssignmentRelationCommand { Relation = WorkAssignmentRelationType.RelativeTo, SourceId = taskData1.Payload!.Id, TargetId = taskData2.Payload!.Id });
 
-                var rsp = await client.PutAsJsonAsync("/TaskTracker/remove-relation", new RemoveWorkAssignmentRelationCommand { Relation = WorkAssignmentRelationType.RelativeTo, SourceId = taskData1.Payload!.Id, TargetId = taskData2.Payload!.Id });
+                var rsp = await client.PutAsync($"/{WorkAssignmentController.RootRoute}/{taskData1.Payload!.Id}/unrelate/{taskData2.Payload!.Id}/{WorkAssignmentRelationType.RelativeTo}", null);
                 var rspData = await rsp.Content.ReadFromJsonAsync<ApiResponseBase>();
                 rspData.Should().NotBeNull();
                 rspData.Success.Should().BeTrue();
@@ -236,7 +254,7 @@ namespace TaskTracker.API.Tests
                 var task1 = GetCreateTaskCommand(title: "Task #1");
                 var taskData1 = await mediator.Send(task1);
 
-                var rspData = await client.GetFromJsonAsync<ApiResponseBase<WorkAssignmentDTO>>($"/TaskTracker/get-task?id={taskData1.Payload!.Id}", _jsonOptions);
+                var rspData = await client.GetFromJsonAsync<ApiResponseBase<WorkAssignmentDTO>>($"/{WorkAssignmentController.RootRoute}/{taskData1.Payload!.Id}", _jsonOptions);
                 rspData.Should().NotBeNull();
 
                 var taskDto = rspData.Payload!;
@@ -266,7 +284,7 @@ namespace TaskTracker.API.Tests
                 await mediator.Send(new AddWorkAssignmentRelationCommand { Relation = WorkAssignmentRelationType.RelativeTo, SourceId = taskData1.Payload!.Id, TargetId = taskData2.Payload!.Id });
                 await mediator.Send(new AddSubWorkAssignmentCommand { WorkAssignmentId = taskData1.Payload!.Id, SubWorkAssignmentId = taskData3.Payload!.Id });
 
-                var rspData = await client.GetFromJsonAsync<ApiResponseBase<WorkAssignmentDTO>>($"/TaskTracker/get-task?id={taskData1.Payload!.Id}", _jsonOptions);
+                var rspData = await client.GetFromJsonAsync<ApiResponseBase<WorkAssignmentDTO>>($"/{WorkAssignmentController.RootRoute}/{taskData1.Payload!.Id}", _jsonOptions);
                 rspData.Should().NotBeNull();
 
                 var taskDto = rspData.Payload!;
@@ -291,7 +309,7 @@ namespace TaskTracker.API.Tests
             {
                 var mediator = sp.GetRequiredService<IMediator>();
                 var taskIds = await CreateTaskListAsync(taskCount, mediator);
-                var data = await client.GetFromJsonAsync<ApiResponseBase<List<WorkAssignmentDTO>>>($"/TaskTracker/get-tasks?withRelatedData=false", _jsonOptions);
+                var data = await client.GetFromJsonAsync<ApiResponseBase<List<WorkAssignmentDTO>>>($"/{WorkAssignmentController.RootRoute}/list?embed=false", _jsonOptions);
                 data.Should().NotBeNull();
                 data.Payload.Should().HaveCountGreaterThanOrEqualTo(taskCount);
 
@@ -336,7 +354,7 @@ namespace TaskTracker.API.Tests
 
         private static Task<string> GetAccessTokenAsync(HttpClient client)
         {
-            return client.GetStringAsync("/JwtGenerator/gen-token?userId=test&username=test");
+            return client.GetStringAsync("/JwtGenerator/generate?userId=test&username=test");
         }
 
         private static async Task<IEnumerable<int>> CreateTaskListAsync(int count, IMediator mediator)

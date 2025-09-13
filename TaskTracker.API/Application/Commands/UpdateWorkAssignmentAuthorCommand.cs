@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
 namespace TaskTracker.API.Application.Commands
@@ -9,11 +10,13 @@ namespace TaskTracker.API.Application.Commands
         /// Идентификатор задачи.
         /// </summary>
         [Required]
+        [FromRoute(Name = "id")]
         public int Id { get; set; }
         /// <summary>
         /// Новое имя автора.
         /// </summary>
         [Required]
-        public string NewAuthor { get; set; } = null!;
+        [FromRoute(Name = "author")]
+        public string Author { get; set; } = null!;
     }
 }

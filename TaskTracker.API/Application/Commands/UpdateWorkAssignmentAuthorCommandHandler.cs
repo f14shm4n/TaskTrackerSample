@@ -24,13 +24,13 @@ namespace TaskTracker.API.Application.Commands
                     return new ApiResponseBase("The task does not exists.", System.Net.HttpStatusCode.BadRequest);
                 }
 
-                entity.SetAuthor(request.NewAuthor);
+                entity.SetAuthor(request.Author);
                 await _workRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
                 return new ApiResponseBase(true);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unable to update work assignment author. WorkAssignmentId: '{Id}', NewAuthor: '{Author}'", request.Id, request.NewAuthor);
+                _logger.LogError(ex, "Unable to update work assignment author. WorkAssignmentId: '{Id}', NewAuthor: '{Author}'", request.Id, request.Author);
             }
             return new ApiResponseBase(false, System.Net.HttpStatusCode.InternalServerError);
         }

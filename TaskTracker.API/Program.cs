@@ -36,9 +36,9 @@ namespace TaskTracker.API
                     };
                 });
 
-            builder.Services.AddAuthorization(); // Enable authorization
-
-            builder.Services.AddControllers()
+            builder.Services
+                .AddAuthorization()
+                .AddControllers()
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());

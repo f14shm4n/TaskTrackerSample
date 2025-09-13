@@ -23,11 +23,11 @@ namespace TaskTracker.API.Application.Queries
                 IEnumerable<WorkAssignment> collection;
                 if (request.WithRelatedData)
                 {
-                    collection = await _workRepository.GetCollectionWithIncludesAsync(request.Offset, request.Limit, request.OnlyHeadTasks, cancellationToken);
+                    collection = await _workRepository.GetCollectionWithIncludesAsync(request.Cursor, request.Limit, request.OnlyHeadTasks, cancellationToken);
                 }
                 else
                 {
-                    collection = await _workRepository.GetCollectionAsync(request.Offset, request.Limit, request.OnlyHeadTasks, cancellationToken);
+                    collection = await _workRepository.GetCollectionAsync(request.Cursor, request.Limit, request.OnlyHeadTasks, cancellationToken);
                 }
                 return new ApiResponseBase<List<WorkAssignmentDTO>>(collection.Select(x => x.ToWorkAssignmentDto()).ToList());
             }

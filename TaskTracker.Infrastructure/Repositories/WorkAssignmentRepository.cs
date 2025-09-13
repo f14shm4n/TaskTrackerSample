@@ -64,44 +64,43 @@ namespace TaskTracker.Infrastructure.Repositories
 
         public Task<WorkAssignment?> GetWithRelationsAsync(int id, CancellationToken cancellationToken)
         {
-            return _context.WorkAssignments
-                .Include(x => x.OutRelations)
-                .Include(x => x.InRelations)
+            return WithRelationsIncludes(_context.WorkAssignments)
                 .AsSplitQuery()
                 .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
         public Task<WorkAssignment?> GetWithRelationsAndSubsAsync(int id, CancellationToken cancellationToken)
         {
-            return _context.WorkAssignments
-                .Include(x => x.SubAssignment)
-                .Include(x => x.OutRelations)
-                .Include(x => x.InRelations)
-                .Include(x => x.HeadAssignment)
+            return WithFullIncludes(_context.WorkAssignments)
                 .AsSplitQuery()
                 .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
-        public async Task<IEnumerable<WorkAssignment>> GetCollectionAsync(int skip, int take, bool onlyHeadLevelObjects, CancellationToken cancellationToken)
+        public async Task<IEnumerable<WorkAssignment>> GetCollectionAsync(int cursor, int take, bool onlyHeadLevelObjects, CancellationToken cancellationToken)
         {
-            return await GetInitQueryCollection(onlyHeadLevelObjects)
-                .Skip(skip)
-                .Take(take)
-                .ToListAsync(cancellationToken);
+            if (cursor > 0)
+            {
+                return await GetInitQueryCollection(onlyHeadLevelObjects)
+                     .Where(x => x.Id > cursor)
+                     .Take(take)
+                     .ToListAsync(cancellationToken);
+            }
+            return await GetInitQueryCollection(onlyHeadLevelObjects).Take(take).ToListAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<WorkAssignment>> GetCollectionWithIncludesAsync(int skip, int take, bool onlyHeadLevelObjects, CancellationToken cancellationToken)
+        public async Task<IEnumerable<WorkAssignment>> GetCollectionWithIncludesAsync(int cursor, int take, bool onlyHeadLevelObjects, CancellationToken cancellationToken)
         {
-            return await GetInitQueryCollection(onlyHeadLevelObjects)
-                .Include(x => x.SubAssignment)
-                .Include(x => x.OutRelations)
-                .Include(x => x.InRelations)
-                .Include(x => x.HeadAssignment)
-                .AsSplitQuery()
-                .OrderBy(x => x.Id)
-                .Skip(skip)
-                .Take(take)
-                .ToListAsync(cancellationToken);
+            if (cursor > 0)
+            {
+                return await WithFullIncludes(GetInitQueryCollection(onlyHeadLevelObjects).Where(x => x.Id > cursor))
+                    .AsSplitQuery()
+                    .Take(take)
+                    .ToListAsync(cancellationToken);
+            }
+            return await WithFullIncludes(GetInitQueryCollection(onlyHeadLevelObjects))
+                    .AsSplitQuery()
+                    .Take(take)
+                    .ToListAsync(cancellationToken);
         }
 
         public Task<bool> ContainsAsync(int id, CancellationToken cancellationToken)
@@ -117,6 +116,22 @@ namespace TaskTracker.Infrastructure.Repositories
         private IQueryable<WorkAssignment> GetInitQueryCollection(bool onlyHeadLevelObjects)
         {
             return onlyHeadLevelObjects ? _context.WorkAssignments.Where(x => x.HeadAssignemtId == null) : _context.WorkAssignments;
+        }
+
+        private static IQueryable<WorkAssignment> WithRelationsIncludes(IQueryable<WorkAssignment> query)
+        {
+            return query
+                .Include(x => x.OutRelations)
+                .Include(x => x.InRelations);
+        }
+
+        private static IQueryable<WorkAssignment> WithFullIncludes(IQueryable<WorkAssignment> query)
+        {
+            return query
+                .Include(x => x.SubAssignment)
+                .Include(x => x.OutRelations)
+                .Include(x => x.InRelations)
+                .Include(x => x.HeadAssignment);
         }
     }
 }

@@ -27,7 +27,7 @@ namespace TaskTracker.API.Controllers
         /// <param name="username"></param>
         /// <param name="roles"></param>
         /// <returns></returns>
-        [HttpGet("gen-token")]
+        [HttpGet("generate")]
         public string GenerateJwtToken(string userId, string username, IEnumerable<string> roles)
         {
             var claims = new List<Claim>

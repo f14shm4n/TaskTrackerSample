@@ -24,13 +24,13 @@ namespace TaskTracker.API.Application.Commands
                     return new ApiResponseBase("The task does not exits.", System.Net.HttpStatusCode.BadRequest);
                 }
 
-                entity.SetPriority(request.NewPriority);
+                entity.SetPriority(request.Priority);
                 await _workRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
                 return new ApiResponseBase(true);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unable to update work assignment priority. WorkAssignmentId: '{Id}' and NewPriority: '{Status}'", request.Id, request.NewPriority);
+                _logger.LogError(ex, "Unable to update work assignment priority. WorkAssignmentId: '{Id}' and NewPriority: '{Status}'", request.Id, request.Priority);
             }
             return new ApiResponseBase(false, System.Net.HttpStatusCode.InternalServerError);
         }
