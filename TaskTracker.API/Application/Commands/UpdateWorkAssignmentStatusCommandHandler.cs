@@ -21,7 +21,7 @@ namespace TaskTracker.API.Application.Commands
                 var entity = await _workRepository.GetAsync(request.Id, cancellationToken);
                 if (entity is null)
                 {
-                    return new ApiResponseBase("The task does not exits.", System.Net.HttpStatusCode.BadRequest);
+                    return new ApiResponseBase("The task does not exits.", System.Net.HttpStatusCode.NotFound);
                 }
 
                 entity.SetStatus(request.Status);

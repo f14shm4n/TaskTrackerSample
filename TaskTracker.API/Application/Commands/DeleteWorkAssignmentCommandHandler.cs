@@ -18,7 +18,11 @@ namespace TaskTracker.API.Application.Commands
         {
             try
             {
-                await _workRepository.DeleteAsync(request.Id, cancellationToken);
+                var r = await _workRepository.DeleteAsync(request.Id, cancellationToken);
+                if (!r)
+                {
+                    return new ApiResponseBase("The task does not exists.", System.Net.HttpStatusCode.NotFound);
+                }
                 return new ApiResponseBase(true);
             }
             catch (Exception ex)

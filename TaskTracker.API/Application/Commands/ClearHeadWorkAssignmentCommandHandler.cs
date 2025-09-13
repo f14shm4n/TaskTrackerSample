@@ -21,7 +21,7 @@ namespace TaskTracker.API.Application.Commands
                 var subWork = await _workRepository.GetAsync(request.Id, cancellationToken);
                 if (subWork is null)
                 {
-                    return new ApiResponseBase("The task is not exists.", System.Net.HttpStatusCode.BadRequest);
+                    return new ApiResponseBase("The task is not exists.", System.Net.HttpStatusCode.NotFound);
                 }
 
                 subWork.RemoveHeadAssignment();

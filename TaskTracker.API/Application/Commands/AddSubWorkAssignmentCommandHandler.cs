@@ -26,17 +26,18 @@ namespace TaskTracker.API.Application.Commands
 
                 if (!await _workRepository.ContainsAsync(request.WorkAssignmentId, cancellationToken))
                 {
-                    return new ApiResponseBase($"A task with {nameof(request.WorkAssignmentId)}: '{request.WorkAssignmentId}' not exists.", System.Net.HttpStatusCode.BadRequest);
+                    return new ApiResponseBase($"A task with {nameof(request.WorkAssignmentId)}: '{request.WorkAssignmentId}' not exists.", System.Net.HttpStatusCode.NotFound);
                 }
 
                 var subWork = await _workRepository.GetAsync(request.SubWorkAssignmentId, cancellationToken);
                 if (subWork is null)
                 {
-                    return new ApiResponseBase($"A task with {nameof(request.SubWorkAssignmentId)}: '{request.SubWorkAssignmentId}' not exists.", System.Net.HttpStatusCode.BadRequest);
+                    return new ApiResponseBase($"A task with {nameof(request.SubWorkAssignmentId)}: '{request.SubWorkAssignmentId}' not exists.", System.Net.HttpStatusCode.NotFound);
                 }
+
                 if (subWork.HeadAssignemtId == request.WorkAssignmentId)
                 {
-                    return new ApiResponseBase("The task is already a subtask of the specified task.", System.Net.HttpStatusCode.BadRequest);
+                    return new ApiResponseBase(true);
                 }
 
                 subWork.SetHeadAssignment(request.WorkAssignmentId);

@@ -26,17 +26,17 @@ namespace TaskTracker.API.Application.Commands
 
                 if (await _workRepository.HasRelationAsync(request.Relation, request.SourceId, request.TargetId, cancellationToken))
                 {
-                    return new ApiResponseBase("The tasks already have such a relation.", System.Net.HttpStatusCode.BadRequest);
+                    return new ApiResponseBase(true);
                 }
 
                 var source = await _workRepository.GetAsync(request.SourceId, cancellationToken);
                 if (source is null)
                 {
-                    return new ApiResponseBase("The source task does not exists.", System.Net.HttpStatusCode.BadRequest);
+                    return new ApiResponseBase("The source task does not exists.", System.Net.HttpStatusCode.NotFound);
                 }
                 if (!await _workRepository.ContainsAsync(request.TargetId, cancellationToken))
                 {
-                    return new ApiResponseBase("The target task does not exits.", System.Net.HttpStatusCode.BadRequest);
+                    return new ApiResponseBase("The target task does not exits.", System.Net.HttpStatusCode.NotFound);
                 }
 
                 // Since we have only one type WorkAssignmentRelationType.RelativeTo

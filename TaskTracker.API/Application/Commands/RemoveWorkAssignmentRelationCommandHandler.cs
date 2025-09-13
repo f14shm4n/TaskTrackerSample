@@ -26,15 +26,10 @@ namespace TaskTracker.API.Application.Commands
 
                 if (!await _workRepository.HasRelationAsync(request.Relation, request.SourceId, request.TargetId, cancellationToken))
                 {
-                    return new ApiResponseBase("The tasks provided have no connections for provided relation type.", System.Net.HttpStatusCode.BadRequest);
+                    return new ApiResponseBase(true);
                 }
 
-                var source = await _workRepository.GetWithRelationsAsync(request.SourceId, cancellationToken);
-                if (source is null)
-                {
-                    return new ApiResponseBase("The source does not exists.", System.Net.HttpStatusCode.BadRequest);
-                }
-
+                var source = (await _workRepository.GetWithRelationsAsync(request.SourceId, cancellationToken))!;
                 // Since we have only one type WorkAssignmentRelationType.RelativeTo
                 // which means that the relation is two way out
                 // Source <--> Target
