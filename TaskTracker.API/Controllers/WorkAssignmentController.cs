@@ -10,7 +10,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace TaskTracker.API.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [ApiController]
     [Route(RootRoute)]
     [Produces("application/json")]
