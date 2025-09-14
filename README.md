@@ -3,14 +3,22 @@
 Тестовое приложение состоящее из одного сервиса **Asp.NetCore WebAPI**.
 
 Содержание:
-- TaskTracker.API проект сервиса (контроллеры, реализация CQRS)
-- TaskTracker.Domain проект домена приложения (модели)
-- TaskTracker.Infrastructure проект инфраструктуры (репозитории, контексты базы данных)
-- TaskTracker.API.Tests проект интеграционных тестов
+- **TaskTracker.API** проект сервиса (контроллеры, реализация CQRS)
+- **TaskTracker.Domain** проект домена приложения (модели)
+- **TaskTracker.Infrastructure** проект инфраструктуры (репозитории, контексты базы данных)
+- **TaskTracker.API.Tests** проект интеграционных тестов
 
 Для запуска локально:
-- нужен SQLExpress localdb
+- нужен **SQLExpress localdb**
 - миграции применяются автоматически из **Program.cs**
-- доступ к WepAPi `http://localhost:5000/swagger/index.html`
+- доступ к WebAPi `http://localhost:5000/swagger/index.html`
 
 Так же есть возможность запускать через **docker-compose**, доступ к WebApi: `http://localhost:8080/swagger/index.html`
+
+Основные конечные точки требуют авторизации через **JWT**, для генерации токена добавлен соотв. контроллер:
+- `TaskTracker.API.Controllers.JwtGeneratorController`
+
+вы можете ввести любые данные для генерации токена.
+
+Так же добавлен котроллер для заполнения базы данных тестовыми данными по требованию:
+- `TaskTracker.API.Controllers.DataSeedController`
