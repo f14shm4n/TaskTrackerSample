@@ -11,5 +11,10 @@ namespace TaskTracker.API.Application.Queries
         /// </summary>
         [FromRoute(Name = "id")]
         public int Id { get; set; }
+        /// <summary>
+        /// Определяет, следует ли извлекать связанные данные задачи, такие как подзадачи, связи с другими задачами и тд.
+        /// </summary>
+        [FromQuery(Name = "embed")]
+        public bool WithEmbedData { get; set; }
     }
 }

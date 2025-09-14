@@ -20,7 +20,17 @@ namespace TaskTracker.API.Application.Queries
         {
             try
             {
-                var entity = await _workRepository.GetWithRelationsAndSubsAsync(request.Id, cancellationToken);
+                WorkAssignment? entity;
+
+                if (request.WithEmbedData)
+                {
+                    entity = await _workRepository.GetFullIncludeAsync(request.Id, cancellationToken);
+                }
+                else
+                {
+                    entity = await _workRepository.GetAsync(request.Id, cancellationToken);
+                }
+
                 if (entity is null)
                 {
                     return new ApiResponseBase<WorkAssignmentDTO>("The task does not exists.", System.Net.HttpStatusCode.NotFound);

@@ -69,7 +69,7 @@ namespace TaskTracker.Infrastructure.Repositories
                 .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
         }
 
-        public Task<WorkAssignment?> GetWithRelationsAndSubsAsync(int id, CancellationToken cancellationToken)
+        public Task<WorkAssignment?> GetFullIncludeAsync(int id, CancellationToken cancellationToken)
         {
             return WithFullIncludes(_context.WorkAssignments)
                 .AsSplitQuery()
@@ -88,7 +88,7 @@ namespace TaskTracker.Infrastructure.Repositories
             return await GetInitQueryCollection(onlyHeadLevelObjects).Take(take).ToListAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<WorkAssignment>> GetCollectionWithIncludesAsync(int cursor, int take, bool onlyHeadLevelObjects, CancellationToken cancellationToken)
+        public async Task<IEnumerable<WorkAssignment>> GetCollectionFullIncludesAsync(int cursor, int take, bool onlyHeadLevelObjects, CancellationToken cancellationToken)
         {
             if (cursor > 0)
             {

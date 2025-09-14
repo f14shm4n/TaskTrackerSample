@@ -21,9 +21,9 @@ namespace TaskTracker.API.Application.Queries
             try
             {
                 IEnumerable<WorkAssignment> collection;
-                if (request.WithRelatedData)
+                if (request.WithEmbedData)
                 {
-                    collection = await _workRepository.GetCollectionWithIncludesAsync(request.Cursor, request.Limit, request.OnlyHeadTasks, cancellationToken);
+                    collection = await _workRepository.GetCollectionFullIncludesAsync(request.Cursor, request.Limit, request.OnlyHeadTasks, cancellationToken);
                 }
                 else
                 {

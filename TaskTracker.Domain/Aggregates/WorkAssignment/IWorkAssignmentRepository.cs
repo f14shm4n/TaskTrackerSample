@@ -10,8 +10,8 @@ namespace TaskTracker.Domain.Aggregates.WorkAssignment
         Task<bool> ContainsAsync(int id, CancellationToken cancellationToken);
         Task<bool> HasRelationAsync(WorkAssignmentRelationType relationType, int sourceId, int targetId, CancellationToken cancellationToken);
         Task<WorkAssignment?> GetWithRelationsAsync(int id, CancellationToken cancellationToken);
-        Task<WorkAssignment?> GetWithRelationsAndSubsAsync(int id, CancellationToken cancellationToken);
+        Task<WorkAssignment?> GetFullIncludeAsync(int id, CancellationToken cancellationToken);
         Task<IEnumerable<WorkAssignment>> GetCollectionAsync(int cursor, int take, bool onlyHeadLevelObjects, CancellationToken cancellationToken);
-        Task<IEnumerable<WorkAssignment>> GetCollectionWithIncludesAsync(int cursor, int take, bool onlyHeadLevelObjects, CancellationToken cancellationToken);
+        Task<IEnumerable<WorkAssignment>> GetCollectionFullIncludesAsync(int cursor, int take, bool onlyHeadLevelObjects, CancellationToken cancellationToken);
     }
 }

@@ -10,7 +10,7 @@ namespace TaskTracker.API.Application.Queries
         /// Определяет, следует ли извлекать связанные данные задачи, такие как подзадачи, связи с другими задачами и тд.
         /// </summary>
         [FromQuery(Name = "embed")]
-        public bool WithRelatedData { get; set; }
+        public bool WithEmbedData { get; set; }
         /// <summary>
         /// Определяет, следует ли возвращать только задачи корневого уровня.
         /// </summary>

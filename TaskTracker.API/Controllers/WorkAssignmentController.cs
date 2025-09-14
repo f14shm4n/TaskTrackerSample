@@ -37,7 +37,7 @@ namespace TaskTracker.API.Controllers
         /// <response code="200">Возвращается если задача создана.</response>
         [HttpPost]
         [ProducesResponseType(typeof(ApiResponseBase<WorkAssignmentDTO>), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<ApiResponseBase<WorkAssignmentDTO>>> CreateTask([FromBody] CreateWorkAssignmentCommand command)
+        public async Task<ActionResult<ApiResponseBase<WorkAssignmentDTO>>> Create([FromBody] CreateWorkAssignmentCommand command)
         {
             return this.ToActionResultResult(await _mediator.Send(command));
         }
@@ -51,7 +51,7 @@ namespace TaskTracker.API.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(ApiResponseBase<WorkAssignmentDTO>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponseBase<WorkAssignmentDTO>), (int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<ApiResponseBase<WorkAssignmentDTO>>> GetTask(GetWorkAssignmentByIdQuery query)
+        public async Task<ActionResult<ApiResponseBase<WorkAssignmentDTO>>> Get(GetWorkAssignmentByIdQuery query)
         {
             return this.ToActionResultResult(await _mediator.Send(query));
         }
@@ -63,7 +63,7 @@ namespace TaskTracker.API.Controllers
         /// <returns>Объект содержащий список с задачами.</returns>
         [HttpGet("list")]
         [ProducesResponseType(typeof(ApiResponseBase<List<WorkAssignmentDTO>>), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<ApiResponseBase<List<WorkAssignmentDTO>>>> GetTasks(GetWorkAssignmentListQuery query)
+        public async Task<ActionResult<ApiResponseBase<List<WorkAssignmentDTO>>>> GetList(GetWorkAssignmentListQuery query)
         {
             return this.ToActionResultResult(await _mediator.Send(query));
         }
@@ -78,7 +78,7 @@ namespace TaskTracker.API.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<ApiResponseBase>> DeleteTask(DeleteWorkAssignmentCommand command)
+        public async Task<ActionResult<ApiResponseBase>> Delete(DeleteWorkAssignmentCommand command)
         {
             return this.ToActionResultResult(await _mediator.Send(command));
         }
@@ -93,7 +93,7 @@ namespace TaskTracker.API.Controllers
         [HttpPut("{id}/status/{status}")]
         [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<ApiResponseBase>> UpdateTaskStatus(UpdateWorkAssignmentStatusCommand command)
+        public async Task<ActionResult<ApiResponseBase>> UpdateStatus(UpdateWorkAssignmentStatusCommand command)
         {
             return this.ToActionResultResult(await _mediator.Send(command));
         }
@@ -107,7 +107,7 @@ namespace TaskTracker.API.Controllers
         [HttpPut("{id}/priority/{priority}")]
         [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<ApiResponseBase>> UpdateTaskPriority(UpdateWorkAssignmentPriorityCommand command)
+        public async Task<ActionResult<ApiResponseBase>> UpdatePriority(UpdateWorkAssignmentPriorityCommand command)
         {
             return this.ToActionResultResult(await _mediator.Send(command));
         }
@@ -122,7 +122,7 @@ namespace TaskTracker.API.Controllers
         [HttpPut("{id}/author/{author}")]
         [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<ApiResponseBase>> UpdateTaskAuthor(UpdateWorkAssignmentAuthorCommand command)
+        public async Task<ActionResult<ApiResponseBase>> UpdateAuthor(UpdateWorkAssignmentAuthorCommand command)
         {
             return this.ToActionResultResult(await _mediator.Send(command));
         }
@@ -137,7 +137,7 @@ namespace TaskTracker.API.Controllers
         [HttpPut("{id}/worker/{worker?}")]
         [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<ApiResponseBase>> UpdateTaskWorker(UpdateWorkAssignmentWorkerCommand command)
+        public async Task<ActionResult<ApiResponseBase>> UpdateWorker(UpdateWorkAssignmentWorkerCommand command)
         {
             return this.ToActionResultResult(await _mediator.Send(command));
         }
@@ -152,7 +152,7 @@ namespace TaskTracker.API.Controllers
         [HttpPut("{id}/worker/unset")]
         [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<ApiResponseBase>> RemoveWorker(int id)
+        public async Task<ActionResult<ApiResponseBase>> UnsetWorker(int id)
         {
             return this.ToActionResultResult(await _mediator.Send(new UpdateWorkAssignmentWorkerCommand() { Id = id }));
         }
@@ -169,7 +169,7 @@ namespace TaskTracker.API.Controllers
         [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<ApiResponseBase>> AddSubTask(AddSubWorkAssignmentCommand command)
+        public async Task<ActionResult<ApiResponseBase>> AddNesting(AddSubWorkAssignmentCommand command)
         {
             return this.ToActionResultResult(await _mediator.Send(command));
         }
@@ -184,7 +184,7 @@ namespace TaskTracker.API.Controllers
         [HttpPut("{id}/unnesting")]
         [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<ApiResponseBase>> ClearMasterTask(ClearHeadWorkAssignmentCommand command)
+        public async Task<ActionResult<ApiResponseBase>> RemoveNesting(ClearHeadWorkAssignmentCommand command)
         {
             return this.ToActionResultResult(await _mediator.Send(command));
         }
@@ -201,7 +201,7 @@ namespace TaskTracker.API.Controllers
         [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.BadRequest)]
         [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<ApiResponseBase>> SetRelation(AddWorkAssignmentRelationCommand command)
+        public async Task<ActionResult<ApiResponseBase>> Relate(AddWorkAssignmentRelationCommand command)
         {
             return this.ToActionResultResult(await _mediator.Send(command));
         }
@@ -216,7 +216,7 @@ namespace TaskTracker.API.Controllers
         [HttpPut("{sourceId}/unrelate/{targetId}/{relationType}")]
         [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<ApiResponseBase>> RemoveRelation(RemoveWorkAssignmentRelationCommand command)
+        public async Task<ActionResult<ApiResponseBase>> Unrelate(RemoveWorkAssignmentRelationCommand command)
         {
             return this.ToActionResultResult(await _mediator.Send(command));
         }
