@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using TaskTracker.Infrastructure;
 
 namespace TaskTracker.API.Application.Commands
 {
@@ -16,6 +17,7 @@ namespace TaskTracker.API.Application.Commands
         /// Новое имя автора.
         /// </summary>
         [Required]
+        [MaxLength(TaskTrackerDbContext.MaxAuthorLength)]
         [FromRoute(Name = "author")]
         public string Author { get; set; } = null!;
     }

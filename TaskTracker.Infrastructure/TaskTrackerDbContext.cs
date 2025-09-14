@@ -11,6 +11,10 @@ namespace TaskTracker.Infrastructure
 {
     public sealed class TaskTrackerDbContext : DbContext, IUnitOfWork
     {
+        public const string WorkAssignmentsTableName = "work_assignments";
+        public const string WorkAssignmentRelationshipsTableName = "work_assignments_relationships";
+        public const int MaxAuthorLength = 100;
+
         public TaskTrackerDbContext(DbContextOptions<TaskTrackerDbContext> options) : base(options)
         {
         }
@@ -26,14 +30,14 @@ namespace TaskTracker.Infrastructure
 
                 x.Property(a => a.Author)
                 .IsRequired()
-                .HasMaxLength(20);
+                .HasMaxLength(MaxAuthorLength);
 
                 x.HasOne(t => t.HeadAssignment)
                 .WithMany(t => t.SubAssignment)
                 .HasForeignKey(t => t.HeadAssignmentId)
                 .IsRequired(false);
 
-                x.ToTable("work_assignments");
+                x.ToTable(WorkAssignmentsTableName);
             });
 
             builder.Entity<WorkAssignmentRelationship>(x =>
@@ -53,7 +57,7 @@ namespace TaskTracker.Infrastructure
                 .HasForeignKey(rel => rel.TargetWorkAssignmentId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-                x.ToTable("work_assignments_relationships");
+                x.ToTable(WorkAssignmentRelationshipsTableName);
             });
         }
     }

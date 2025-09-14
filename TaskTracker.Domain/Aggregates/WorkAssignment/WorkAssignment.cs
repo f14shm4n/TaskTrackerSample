@@ -78,6 +78,7 @@ namespace TaskTracker.Domain.Aggregates.WorkAssignment
         {
             _outRelations.Add(new WorkAssignmentRelationship(relationType, Id, toWorkAssignmentId));
         }
+
         public void AddInRelation(WorkAssignmentRelationType relationType, int fromWorkAssignmentId)
         {
             _inRelations.Add(new WorkAssignmentRelationship(relationType, fromWorkAssignmentId, Id));
