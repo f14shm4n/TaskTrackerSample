@@ -611,7 +611,7 @@ namespace TaskTracker.API.Tests
                 {
                     var data = await client.GetFromJsonAsync<ApiResponseBase<List<WorkAssignmentDTO>>>($"/{WorkAssignmentController.RootRoute}/list?embed=true&cursor={t1.Id - 1}&limit=2", _jsonOptions);
                     data.Should().NotBeNull();
-                    data.Payload.Should().HaveCountGreaterThanOrEqualTo(1);
+                    data.Payload.Should().HaveCount(2);
                     data.Payload.ForEach(x =>
                     {
                         if (x.Id == t1.Id)
