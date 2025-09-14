@@ -30,7 +30,7 @@ namespace TaskTracker.API.Tests
         #region Create
 
         [Fact]
-        public async Task CreateWorkAssignment()
+        public async Task Create_should_ok()
         {
             await DoWorkAsync(async (client, sp) =>
             {
@@ -51,7 +51,7 @@ namespace TaskTracker.API.Tests
         #region Delete
 
         [Fact]
-        public async Task DeleteWorkAssignment_should_ok()
+        public async Task Delete_should_ok()
         {
             await DoWorkAsync(async (client, sp) =>
             {
@@ -63,7 +63,7 @@ namespace TaskTracker.API.Tests
         }
 
         [Fact]
-        public async Task DeleteWorkAssignment_should_not_found()
+        public async Task Delete_should_not_found()
         {
             await DoWorkAsync(async (client, sp) =>
             {
@@ -78,23 +78,28 @@ namespace TaskTracker.API.Tests
         #region UpdateStatus
 
         [Fact]
-        public async Task UpdateWorkAssignmentStatus_should_ok()
+        public async Task UpdateStatus_should_ok()
         {
             await DoWorkAsync(async (client, sp) =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
                 var id = (await CreateTaskListAsync(1, mediator)).First();
 
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id}/status/{WorkAssignmentStatus.InProgress}", HttpStatusCode.OK);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeTrue();
-
-                await RemoveTaskListAsync(mediator, id);
+                try
+                {
+                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id}/status/{WorkAssignmentStatus.InProgress}", HttpStatusCode.OK);
+                    rsp.Should().NotBeNull();
+                    rsp.Success.Should().BeTrue();
+                }
+                finally
+                {
+                    await RemoveTaskListAsync(mediator, id);
+                }
             });
         }
 
         [Fact]
-        public async Task UpdateWorkAssignmentStatus_should_notFound()
+        public async Task UpdateStatus_should_notFound()
         {
             await DoWorkAsync(async (client, sp) =>
             {
@@ -109,23 +114,28 @@ namespace TaskTracker.API.Tests
         #region UpdatePriority
 
         [Fact]
-        public async Task UpdateWorkAssignmentPriority_should_ok()
+        public async Task UpdatePriority_should_ok()
         {
             await DoWorkAsync(async (client, sp) =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
                 var id = (await CreateTaskListAsync(1, mediator)).First();
 
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id}/priority/{WorkAssignmentPriority.Medium}", HttpStatusCode.OK);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeTrue();
-
-                await RemoveTaskListAsync(mediator, id);
+                try
+                {
+                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id}/priority/{WorkAssignmentPriority.Medium}", HttpStatusCode.OK);
+                    rsp.Should().NotBeNull();
+                    rsp.Success.Should().BeTrue();
+                }
+                finally
+                {
+                    await RemoveTaskListAsync(mediator, id);
+                }
             });
         }
 
         [Fact]
-        public async Task UpdateWorkAssignmentPriority_should_notFound()
+        public async Task UpdatePriority_should_notFound()
         {
             await DoWorkAsync(async (client, sp) =>
             {
@@ -140,23 +150,28 @@ namespace TaskTracker.API.Tests
         #region UpdateAuthor
 
         [Fact]
-        public async Task UpdateWorkAssignmentAuthor_should_ok()
+        public async Task UpdateAuthor_should_ok()
         {
             await DoWorkAsync(async (client, sp) =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
                 var id = (await CreateTaskListAsync(1, mediator)).First();
 
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id}/author/Sergey", HttpStatusCode.OK);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeTrue();
-
-                await RemoveTaskListAsync(mediator, id);
+                try
+                {
+                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id}/author/Sergey", HttpStatusCode.OK);
+                    rsp.Should().NotBeNull();
+                    rsp.Success.Should().BeTrue();
+                }
+                finally
+                {
+                    await RemoveTaskListAsync(mediator, id);
+                }
             });
         }
 
         [Fact]
-        public async Task UpdateWorkAssignmentAuthor_should_notFound()
+        public async Task UpdateAuthor_should_notFound()
         {
             await DoWorkAsync(async (client, sp) =>
             {
@@ -174,23 +189,28 @@ namespace TaskTracker.API.Tests
         [InlineData(null, "Ivan")]
         [InlineData("", "Ivan")]
         [InlineData("Petya", "Ivan")]
-        public async Task UpdateWorkAssignmentWorker_should_ok(string? oldWorker, string? newWorker)
+        public async Task UpdateWorker_should_ok(string? oldWorker, string? newWorker)
         {
             await DoWorkAsync(async (client, sp) =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
                 var id = (await mediator.Send(CreateTaskCreationCommand(worker: oldWorker))).Payload!.Id;
 
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id}/worker/{newWorker}", HttpStatusCode.OK);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeTrue();
-
-                await RemoveTaskListAsync(mediator, id);
+                try
+                {
+                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id}/worker/{newWorker}", HttpStatusCode.OK);
+                    rsp.Should().NotBeNull();
+                    rsp.Success.Should().BeTrue();
+                }
+                finally
+                {
+                    await RemoveTaskListAsync(mediator, id);
+                }
             });
         }
 
         [Fact]
-        public async Task UpdateWorkAssignmentWorker_should_notFound()
+        public async Task UpdateWorker_should_notFound()
         {
             await DoWorkAsync(async (client, sp) =>
             {
@@ -200,24 +220,33 @@ namespace TaskTracker.API.Tests
             });
         }
 
+        #endregion
+
+        #region UnsetWorker
+
         [Fact]
-        public async Task RemoveWorkAssignmentWorker_should_ok()
+        public async Task UnsetWorker_should_ok()
         {
             await DoWorkAsync(async (client, sp) =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
                 var id = (await mediator.Send(CreateTaskCreationCommand(worker: "Vasya"))).Payload!.Id;
 
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id}/worker/unset", HttpStatusCode.OK);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeTrue();
-
-                await RemoveTaskListAsync(mediator, id);
+                try
+                {
+                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id}/worker/unset", HttpStatusCode.OK);
+                    rsp.Should().NotBeNull();
+                    rsp.Success.Should().BeTrue();
+                }
+                finally
+                {
+                    await RemoveTaskListAsync(mediator, id);
+                }
             });
         }
 
         [Fact]
-        public async Task RemoveWorkAssignmentWorker_should_notFound()
+        public async Task UnsetWorker_should_notFound()
         {
             await DoWorkAsync(async (client, sp) =>
             {
@@ -229,10 +258,10 @@ namespace TaskTracker.API.Tests
 
         #endregion
 
-        #region AddSubTask
+        #region AddNesting
 
         [Fact]
-        public async Task AddSubWorkAssignment_should_ok()
+        public async Task AddNesting_should_ok()
         {
             await DoWorkAsync(async (client, sp) =>
             {
@@ -240,16 +269,21 @@ namespace TaskTracker.API.Tests
                 var id1 = (await mediator.Send(CreateTaskCreationCommand(title: "Master task #1"))).Payload!.Id;
                 var id2 = (await mediator.Send(CreateTaskCreationCommand(title: "Sub task #1-1"))).Payload!.Id;
 
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/nesting/{id2}", HttpStatusCode.OK);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeTrue();
-
-                await RemoveTaskListAsync(mediator, id1, id2);
+                try
+                {
+                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/nesting/{id2}", HttpStatusCode.OK);
+                    rsp.Should().NotBeNull();
+                    rsp.Success.Should().BeTrue();
+                }
+                finally
+                {
+                    await RemoveTaskListAsync(mediator, id1, id2);
+                }
             });
         }
 
         [Fact]
-        public async Task AddSubWorkAssignment_should_ok_alreadySubtask()
+        public async Task AddNesting_alreadySubtask_should_ok()
         {
             await DoWorkAsync(async (client, sp) =>
             {
@@ -257,28 +291,34 @@ namespace TaskTracker.API.Tests
                 var id1 = (await mediator.Send(CreateTaskCreationCommand(title: "Master task #1"))).Payload!.Id;
                 var id2 = (await mediator.Send(CreateTaskCreationCommand(title: "Sub task #1-1"))).Payload!.Id;
 
-                await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/nesting/{id2}", HttpStatusCode.OK);
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/nesting/{id2}", HttpStatusCode.OK);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeTrue();
+                try
+                {
+                    await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/nesting/{id2}", HttpStatusCode.OK);
+                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/nesting/{id2}", HttpStatusCode.OK);
+                    rsp.Should().NotBeNull();
+                    rsp.Success.Should().BeTrue();
 
-                await RemoveTaskListAsync(mediator, id1, id2);
+                }
+                finally
+                {
+                    await RemoveTaskListAsync(mediator, id1, id2);
+                }
             });
         }
 
         [Fact]
-        public async Task AddSubWorkAssignment_should_badRequest_sameIds()
+        public async Task AddNesting_sameIds_should_badRequest()
         {
             await DoWorkAsync(async (client, sp) =>
             {
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/1/nesting/1", HttpStatusCode.BadRequest);
+                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}/nesting/{InvalidId}", HttpStatusCode.BadRequest);
                 rsp.Should().NotBeNull();
                 rsp.Success.Should().BeFalse();
             });
         }
 
         [Fact]
-        public async Task AddSubWorkAssignment_should_notFound_headId()
+        public async Task AddNesting_headId_should_notFound()
         {
             await DoWorkAsync(async (client, sp) =>
             {
@@ -289,26 +329,32 @@ namespace TaskTracker.API.Tests
         }
 
         [Fact]
-        public async Task AddSubWorkAssignment_should_notFound_subId()
+        public async Task AddNesting_subId_should_notFound()
         {
             await DoWorkAsync(async (client, sp) =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
                 var id1 = (await mediator.Send(CreateTaskCreationCommand(title: "Master task #1"))).Payload!.Id;
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/nesting/{InvalidId}", HttpStatusCode.NotFound);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeFalse();
 
-                await RemoveTaskListAsync(mediator, id1);
+                try
+                {
+                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/nesting/{InvalidId}", HttpStatusCode.NotFound);
+                    rsp.Should().NotBeNull();
+                    rsp.Success.Should().BeFalse();
+                }
+                finally
+                {
+                    await RemoveTaskListAsync(mediator, id1);
+                }
             });
         }
 
         #endregion
 
-        #region ClearRootTask
+        #region RemoveNesting
 
         [Fact]
-        public async Task ClearHeadWorkAssignment_should_ok()
+        public async Task RemoveNesting_should_ok()
         {
             await DoWorkAsync(async (client, sp) =>
             {
@@ -317,16 +363,21 @@ namespace TaskTracker.API.Tests
                 var id2 = (await mediator.Send(CreateTaskCreationCommand(title: "Sub task #1-1"))).Payload!.Id;
                 await mediator.Send(new AddSubWorkAssignmentCommand { WorkAssignmentId = id1, SubWorkAssignmentId = id2 });
 
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id2}/unnesting", HttpStatusCode.OK);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeTrue();
-
-                await RemoveTaskListAsync(mediator, id1, id2);
+                try
+                {
+                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id2}/unnesting", HttpStatusCode.OK);
+                    rsp.Should().NotBeNull();
+                    rsp.Success.Should().BeTrue();
+                }
+                finally
+                {
+                    await RemoveTaskListAsync(mediator, id1, id2);
+                }
             });
         }
 
         [Fact]
-        public async Task ClearHeadWorkAssignment_should_notFound()
+        public async Task RemoveNesting_should_notFound()
         {
             await DoWorkAsync(async (client, sp) =>
             {
@@ -338,10 +389,10 @@ namespace TaskTracker.API.Tests
 
         #endregion
 
-        #region SetRelation
+        #region Relate
 
         [Fact]
-        public async Task SetRelation_should_ok()
+        public async Task Relate_should_ok()
         {
             await DoWorkAsync(async (client, sp) =>
             {
@@ -349,16 +400,21 @@ namespace TaskTracker.API.Tests
                 var id1 = (await mediator.Send(CreateTaskCreationCommand(title: "task #1"))).Payload!.Id;
                 var id2 = (await mediator.Send(CreateTaskCreationCommand(title: "task #1-1"))).Payload!.Id;
 
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/relate/{id2}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.OK);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeTrue();
-
-                await RemoveTaskListAsync(mediator, id1, id2);
+                try
+                {
+                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/relate/{id2}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.OK);
+                    rsp.Should().NotBeNull();
+                    rsp.Success.Should().BeTrue();
+                }
+                finally
+                {
+                    await RemoveTaskListAsync(mediator, id1, id2);
+                }
             });
         }
 
         [Fact]
-        public async Task SetRelation_should_ok_hasRelation()
+        public async Task Relate_hasRelation_should_ok()
         {
             await DoWorkAsync(async (client, sp) =>
             {
@@ -366,28 +422,33 @@ namespace TaskTracker.API.Tests
                 var id1 = (await mediator.Send(CreateTaskCreationCommand(title: "task #1"))).Payload!.Id;
                 var id2 = (await mediator.Send(CreateTaskCreationCommand(title: "task #1-1"))).Payload!.Id;
 
-                await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/relate/{id2}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.OK);
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/relate/{id2}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.OK);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeTrue();
-
-                await RemoveTaskListAsync(mediator, id1, id2);
+                try
+                {
+                    await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/relate/{id2}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.OK);
+                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/relate/{id2}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.OK);
+                    rsp.Should().NotBeNull();
+                    rsp.Success.Should().BeTrue();
+                }
+                finally
+                {
+                    await RemoveTaskListAsync(mediator, id1, id2);
+                }
             });
         }
 
         [Fact]
-        public async Task SetRelation_should_badRequest_sameIds()
+        public async Task Relate_sameIds_should_badRequest()
         {
             await DoWorkAsync(async (client, sp) =>
             {
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/1/relate/1/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.BadRequest);
+                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}/relate/{InvalidId}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.BadRequest);
                 rsp.Should().NotBeNull();
                 rsp.Success.Should().BeFalse();
             });
         }
 
         [Fact]
-        public async Task SetRelation_should_notFound_sourceId()
+        public async Task Relate_sourceId_should_notFound()
         {
             await DoWorkAsync(async (client, sp) =>
             {
@@ -398,27 +459,32 @@ namespace TaskTracker.API.Tests
         }
 
         [Fact]
-        public async Task SetRelation_should_notFound_targetId()
+        public async Task Relate_targetId_should_notFound()
         {
             await DoWorkAsync(async (client, sp) =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
                 var id1 = (await mediator.Send(CreateTaskCreationCommand(title: "task #1"))).Payload!.Id;
 
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/relate/1/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.NotFound);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeFalse();
-
-                await RemoveTaskListAsync(mediator, id1);
+                try
+                {
+                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/relate/{InvalidId}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.NotFound);
+                    rsp.Should().NotBeNull();
+                    rsp.Success.Should().BeFalse();
+                }
+                finally
+                {
+                    await RemoveTaskListAsync(mediator, id1);
+                }
             });
         }
 
         #endregion
 
-        #region RemoveRelation
+        #region Unrelate
 
         [Fact]
-        public async Task RemoveRelation_should_ok()
+        public async Task Unrelate_should_ok()
         {
             await DoWorkAsync(async (client, sp) =>
             {
@@ -427,16 +493,21 @@ namespace TaskTracker.API.Tests
                 var id2 = (await mediator.Send(CreateTaskCreationCommand(title: "task #1-1"))).Payload!.Id;
                 await mediator.Send(new AddWorkAssignmentRelationCommand { Relation = WorkAssignmentRelationType.RelativeTo, SourceId = id1, TargetId = id2 });
 
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/unrelate/{id2}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.OK);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeTrue();
-
-                await RemoveTaskListAsync(mediator, id1, id2);
+                try
+                {
+                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/unrelate/{id2}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.OK);
+                    rsp.Should().NotBeNull();
+                    rsp.Success.Should().BeTrue();
+                }
+                finally
+                {
+                    await RemoveTaskListAsync(mediator, id1, id2);
+                }
             });
         }
 
         [Fact]
-        public async Task RemoveRelation_should_ok_noRelation()
+        public async Task Unrelate_noRelation_should_ok()
         {
             await DoWorkAsync(async (client, sp) =>
             {
@@ -444,94 +515,185 @@ namespace TaskTracker.API.Tests
                 var id1 = (await mediator.Send(CreateTaskCreationCommand(title: "task #1"))).Payload!.Id;
                 var id2 = (await mediator.Send(CreateTaskCreationCommand(title: "task #1-1"))).Payload!.Id;
 
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/unrelate/{id2}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.OK);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeTrue();
+                try
+                {
+                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/unrelate/{id2}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.OK);
+                    rsp.Should().NotBeNull();
+                    rsp.Success.Should().BeTrue();
+                }
+                finally
+                {
+                    await RemoveTaskListAsync(mediator, id1, id2);
+                }
+            });
+        }
 
-                await RemoveTaskListAsync(mediator, id1, id2);
+        [Fact]
+        public async Task Unrelate_sameIds_should_badRequest()
+        {
+            await DoWorkAsync(async (client, sp) =>
+            {
+                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}/unrelate/{InvalidId}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.BadRequest);
+                rsp.Should().NotBeNull();
+                rsp.Success.Should().BeFalse();
             });
         }
 
         #endregion
 
+        #region Get
+
         [Fact]
-        public async Task Get_without_subs_relations()
+        public async Task Get_withoutEmbed_should_ok()
         {
             await DoWorkAsync(async (client, sp) =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
-                var task1 = CreateTaskCreationCommand(title: "Task #1");
-                var taskData1 = await mediator.Send(task1);
-
-                var rspData = await client.GetFromJsonAsync<ApiResponseBase<WorkAssignmentDTO>>($"/{WorkAssignmentController.RootRoute}/{taskData1.Payload!.Id}", _jsonOptions);
-                rspData.Should().NotBeNull();
-
-                var taskDto = rspData.Payload!;
-                taskDto.Title.Should().Be(task1.Title);
-                taskDto.SubAssignments.Should().BeNullOrEmpty();
-                taskDto.OutRelations.Should().BeNullOrEmpty();
-                taskDto.InRelations.Should().BeNullOrEmpty();
-
-                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData1.Payload!.Id });
+                var t1 = (await mediator.Send(CreateTaskCreationCommand(title: "Task #1"))).Payload!;
+                try
+                {
+                    var dto = (await client.GetFromJsonAsync<ApiResponseBase<WorkAssignmentDTO>>($"/{WorkAssignmentController.RootRoute}/{t1.Id}", _jsonOptions))?.Payload!;
+                    dto.Title.Should().Be(t1.Title);
+                    dto.SubAssignments.Should().BeNullOrEmpty();
+                    dto.OutRelations.Should().BeNullOrEmpty();
+                    dto.InRelations.Should().BeNullOrEmpty();
+                }
+                finally
+                {
+                    await RemoveTaskListAsync(mediator, t1.Id);
+                }
             });
         }
 
         [Fact]
-        public async Task Get_with_subs_relations()
+        public async Task Get_withEmbed_should_ok()
         {
             await DoWorkAsync(async (client, sp) =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
-                var task1 = CreateTaskCreationCommand(title: "Task #1");
-                var task2 = CreateTaskCreationCommand(title: "Task #2");
-                var task3 = CreateTaskCreationCommand(title: "Sub Task #3");
-                var taskData1 = await mediator.Send(task1);
-                var taskData2 = await mediator.Send(task2);
-                var taskData3 = await mediator.Send(task3);
-                await mediator.Send(new AddWorkAssignmentRelationCommand { Relation = WorkAssignmentRelationType.RelativeTo, SourceId = taskData1.Payload!.Id, TargetId = taskData2.Payload!.Id });
-                await mediator.Send(new AddSubWorkAssignmentCommand { WorkAssignmentId = taskData1.Payload!.Id, SubWorkAssignmentId = taskData3.Payload!.Id });
+                var t1 = (await mediator.Send(CreateTaskCreationCommand(title: "Task #1"))).Payload!;
+                var t2 = (await mediator.Send(CreateTaskCreationCommand(title: "Task #2"))).Payload!;
+                var t3 = (await mediator.Send(CreateTaskCreationCommand(title: "Sub Task #3"))).Payload!;
+                await mediator.Send(new AddWorkAssignmentRelationCommand { Relation = WorkAssignmentRelationType.RelativeTo, SourceId = t1.Id, TargetId = t2.Id });
+                await mediator.Send(new AddSubWorkAssignmentCommand { WorkAssignmentId = t1.Id, SubWorkAssignmentId = t3.Id });
 
-                var rspData = await client.GetFromJsonAsync<ApiResponseBase<WorkAssignmentDTO>>($"/{WorkAssignmentController.RootRoute}/{taskData1.Payload!.Id}", _jsonOptions);
-                rspData.Should().NotBeNull();
+                try
+                {
+                    var taskDto = (await client.GetFromJsonAsync<ApiResponseBase<WorkAssignmentDTO>>($"/{WorkAssignmentController.RootRoute}/{t1.Id}?embed=true", _jsonOptions))?.Payload!;
+                    taskDto.Title.Should().Be(t1.Title);
+                    taskDto.SubAssignments.Should().NotBeNullOrEmpty();
+                    taskDto.OutRelations.Should().NotBeNullOrEmpty();
+                    taskDto.InRelations.Should().NotBeNullOrEmpty();
+                }
+                finally
+                {
+                    await RemoveTaskListAsync(mediator, t1.Id, t2.Id, t3.Id);
+                }
+            });
+        }
 
-                var taskDto = rspData.Payload!;
-                taskDto.Title.Should().Be(task1.Title);
-                taskDto.SubAssignments.Should().NotBeNullOrEmpty();
-                taskDto.OutRelations.Should().NotBeNullOrEmpty();
-                taskDto.InRelations.Should().NotBeNullOrEmpty();
+        #endregion
 
-                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData3.Payload!.Id });
-                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData2.Payload!.Id });
-                await mediator.Send(new DeleteWorkAssignmentCommand { Id = taskData1.Payload!.Id });
+        #region GetList
+
+        [Fact]
+        public async Task GetTasks_withEmbed_cursor_limit_should_ok()
+        {
+            await DoWorkAsync(async (client, sp) =>
+            {
+                var mediator = sp.GetRequiredService<IMediator>();
+                var t1 = (await mediator.Send(CreateTaskCreationCommand(title: "Task #1"))).Payload!;
+                var t2 = (await mediator.Send(CreateTaskCreationCommand(title: "Sub Task #1-1"))).Payload!;
+                await mediator.Send(new AddWorkAssignmentRelationCommand { Relation = WorkAssignmentRelationType.RelativeTo, SourceId = t1.Id, TargetId = t2.Id });
+                await mediator.Send(new AddSubWorkAssignmentCommand { WorkAssignmentId = t1.Id, SubWorkAssignmentId = t2.Id });
+
+                try
+                {
+                    var data = await client.GetFromJsonAsync<ApiResponseBase<List<WorkAssignmentDTO>>>($"/{WorkAssignmentController.RootRoute}/list?embed=true&cursor={t1.Id - 1}&limit=2", _jsonOptions);
+                    data.Should().NotBeNull();
+                    data.Payload.Should().HaveCountGreaterThanOrEqualTo(1);
+                    data.Payload.ForEach(x =>
+                    {
+                        if (x.Id == t1.Id)
+                        {
+                            x.SubAssignments.Should().HaveCount(1);
+                            x.InRelations.Should().HaveCount(1);
+                            x.OutRelations.Should().HaveCount(1);
+                        }
+                        else if (x.Id == t2.Id)
+                        {
+                            x.HeadAssignmentId.Should().NotBeNull();
+                            x.HeadAssignmentId.Should().Be(t1.Id);
+                            x.HeadAssignment.Should().NotBeNull();
+                            x.InRelations.Should().HaveCount(1);
+                            x.OutRelations.Should().HaveCount(1);
+                        }
+                    });
+                }
+                finally
+                {
+                    await RemoveTaskListAsync(mediator, t1.Id, t2.Id);
+                }
             });
         }
 
         [Fact]
-        public async Task GetTasks_without_relations()
+        public async Task GetList_withoutEmbed_should_ok()
         {
-            const int taskCount = 5;
             await DoWorkAsync(async (client, sp) =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
-                var taskIds = await CreateTaskListAsync(taskCount, mediator);
-                var data = await client.GetFromJsonAsync<ApiResponseBase<List<WorkAssignmentDTO>>>($"/{WorkAssignmentController.RootRoute}/list?embed=false", _jsonOptions);
-                data.Should().NotBeNull();
-                data.Payload.Should().HaveCountGreaterThanOrEqualTo(taskCount);
+                var t1 = (await mediator.Send(CreateTaskCreationCommand(title: "Task #1"))).Payload!;
+                var t2 = (await mediator.Send(CreateTaskCreationCommand(title: "Sub Task #1-1"))).Payload!;
+                await mediator.Send(new AddSubWorkAssignmentCommand { WorkAssignmentId = t1.Id, SubWorkAssignmentId = t2.Id });
 
-                await RemoveTaskListAsync(mediator, taskIds.ToArray());
+                try
+                {
+                    var data = await client.GetFromJsonAsync<ApiResponseBase<List<WorkAssignmentDTO>>>($"/{WorkAssignmentController.RootRoute}/list?embed=false", _jsonOptions);
+                    data.Should().NotBeNull();
+                    data.Payload.Should().HaveCountGreaterThanOrEqualTo(2);
+                    data.Payload.ForEach(x =>
+                    {
+                        x.HeadAssignment.Should().BeNull();
+                        x.SubAssignments.Should().BeNullOrEmpty();
+                        x.InRelations.Should().BeNullOrEmpty();
+                        x.OutRelations.Should().BeNullOrEmpty();
+                    });
+                }
+                finally
+                {
+                    await RemoveTaskListAsync(mediator, t1.Id, t2.Id);
+                }
             });
         }
+
+        [Fact]
+        public async Task GetList_onlyRoot_should_ok()
+        {
+            await DoWorkAsync(async (client, sp) =>
+            {
+                var mediator = sp.GetRequiredService<IMediator>();
+                var t1 = (await mediator.Send(CreateTaskCreationCommand(title: "Task #1"))).Payload!;
+                var t2 = (await mediator.Send(CreateTaskCreationCommand(title: "Sub Task #1-1"))).Payload!;
+                await mediator.Send(new AddSubWorkAssignmentCommand { WorkAssignmentId = t1.Id, SubWorkAssignmentId = t2.Id });
+
+                try
+                {
+                    var data = await client.GetFromJsonAsync<ApiResponseBase<List<WorkAssignmentDTO>>>($"/{WorkAssignmentController.RootRoute}/list?onlyRoot=true", _jsonOptions);
+                    data.Should().NotBeNull();
+                    data.Payload.Should().HaveCountGreaterThanOrEqualTo(1);
+                    data.Payload.Should().OnlyContain(x => x.HeadAssignmentId == null);
+                }
+                finally
+                {
+                    await RemoveTaskListAsync(mediator, t1.Id, t2.Id);
+                }
+            });
+        }
+
+        #endregion
 
         #region Utils
-
-        private async Task DoWorkAsync(Func<HttpClient, IServiceProvider, Task> work)
-        {
-            var client = await CreateClientWithJwt();
-            using (var scope = _factory.Services.CreateScope())
-            {
-                await work(client, scope.ServiceProvider);
-            }
-        }
 
         #region HttpClient
 
@@ -565,6 +727,15 @@ namespace TaskTracker.API.Tests
         }
 
         #endregion
+
+        private async Task DoWorkAsync(Func<HttpClient, IServiceProvider, Task> work)
+        {
+            var client = await CreateClientWithJwt();
+            using (var scope = _factory.Services.CreateScope())
+            {
+                await work(client, scope.ServiceProvider);
+            }
+        }
 
         private static CreateWorkAssignmentCommand CreateTaskCreationCommand(
             string title = "Test task #1",
