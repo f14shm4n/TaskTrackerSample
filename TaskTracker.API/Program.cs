@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
 using TaskTracker.API.Application.Jwt;
+using TaskTracker.API.Application.Services;
 using TaskTracker.Domain.Aggregates.WorkAssignment;
 using TaskTracker.Infrastructure;
 using TaskTracker.Infrastructure.Repositories;
@@ -103,23 +104,23 @@ namespace TaskTracker.API
 
         private static void AddServices(WebApplicationBuilder builder)
         {
-            builder.Services.Configure<AppJwtOptions>(builder.Configuration.GetSection("Jwt"));
-            builder.Services.AddDbContextPool<TaskTrackerDbContext>(o =>
-            {
-                o.UseSqlServer(
+            builder.Services
+                .Configure<AppJwtOptions>(builder.Configuration.GetSection("Jwt"))
+                .AddDbContextPool<TaskTrackerDbContext>(o =>
+                {
+                    o.UseSqlServer(
                     builder.Configuration.GetConnectionString("DefaultConnection"),
                     x =>
                     {
                         x.MigrationsAssembly(typeof(Program).Assembly);
                     });
-            });
-
-            builder.Services.AddMediatR(c =>
-            {
-                c.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
-            });
-
-            builder.Services.AddScoped<IWorkAssignmentRepository, WorkAssignmentRepository>();
+                })
+                .AddMediatR(c =>
+                {
+                    c.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+                })
+                .AddScoped<IWorkAssignmentRepository, WorkAssignmentRepository>()
+                .AddScoped<IDataSeeder, DataSeeder>();
         }
 
         private static void SetupDatabase(WebApplication app)
