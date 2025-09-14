@@ -35,7 +35,7 @@ namespace TaskTracker.API.Application.Commands
                     return new ApiResponseBase($"A task with {nameof(request.SubWorkAssignmentId)}: '{request.SubWorkAssignmentId}' not exists.", System.Net.HttpStatusCode.NotFound);
                 }
 
-                if (subWork.HeadAssignemtId == request.WorkAssignmentId)
+                if (subWork.HeadAssignmentId == request.WorkAssignmentId)
                 {
                     return new ApiResponseBase(true);
                 }

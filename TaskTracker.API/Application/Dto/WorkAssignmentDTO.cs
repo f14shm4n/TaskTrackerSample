@@ -1,7 +1,9 @@
-﻿using TaskTracker.Domain.Aggregates.WorkAssignment;
+﻿using System.Diagnostics;
+using TaskTracker.Domain.Aggregates.WorkAssignment;
 
 namespace TaskTracker.API.Application.Dto
 {
+    [DebuggerDisplay("[{Id}] (S: {Status}, P: {Priority}, RootId: {HeadAssignmentId})")]
     public class WorkAssignmentDTO
     {
         public int Id { get; set; }

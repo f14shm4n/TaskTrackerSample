@@ -37,6 +37,8 @@ namespace TaskTracker.API.Application.Extensions
             return dto;
         }
 
+        public static WorkAssignmentDTO ToWorkAssignmentDtoNoEmbed(this WorkAssignment workAssignment) => CreateWorkAssignmentDto(workAssignment);
+
         private static WorkAssignmentDTO CreateWorkAssignmentDto(WorkAssignment workAssignment)
         {
             return new WorkAssignmentDTO
@@ -47,7 +49,7 @@ namespace TaskTracker.API.Application.Extensions
                 Priority = workAssignment.Priority,
                 Author = workAssignment.Author,
                 Worker = workAssignment.Worker,
-                HeadAssignmentId = workAssignment.HeadAssignemtId
+                HeadAssignmentId = workAssignment.HeadAssignmentId
             };
         }
 

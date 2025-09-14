@@ -20,16 +20,20 @@ namespace TaskTracker.API.Application.Queries
         {
             try
             {
-                IEnumerable<WorkAssignment> collection;
                 if (request.WithEmbedData)
                 {
-                    collection = await _workRepository.GetCollectionFullIncludesAsync(request.Cursor, request.Limit, request.OnlyHeadTasks, cancellationToken);
+                    return new ApiResponseBase<List<WorkAssignmentDTO>>(
+                        (await _workRepository.GetCollectionFullIncludesAsync(request.Cursor, request.Limit, request.OnlyHeadTasks, cancellationToken))
+                        .Select(x => x.ToWorkAssignmentDto())
+                        .ToList());
                 }
                 else
                 {
-                    collection = await _workRepository.GetCollectionAsync(request.Cursor, request.Limit, request.OnlyHeadTasks, cancellationToken);
+                    return new ApiResponseBase<List<WorkAssignmentDTO>>(
+                        (await _workRepository.GetCollectionAsync(request.Cursor, request.Limit, request.OnlyHeadTasks, cancellationToken))
+                        .Select(x => x.ToWorkAssignmentDtoNoEmbed())
+                        .ToList());
                 }
-                return new ApiResponseBase<List<WorkAssignmentDTO>>(collection.Select(x => x.ToWorkAssignmentDto()).ToList());
             }
             catch (Exception ex)
             {

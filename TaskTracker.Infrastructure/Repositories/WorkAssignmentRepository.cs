@@ -40,8 +40,8 @@ namespace TaskTracker.Infrastructure.Repositories
                         .ExecuteDeleteAsync(cancellationToken);
 
                     await _context.WorkAssignments
-                        .Where(x => x.HeadAssignemtId == id)
-                        .ExecuteUpdateAsync(setters => setters.SetProperty(x => x.HeadAssignemtId, (int?)null), cancellationToken);
+                        .Where(x => x.HeadAssignmentId == id)
+                        .ExecuteUpdateAsync(setters => setters.SetProperty(x => x.HeadAssignmentId, (int?)null), cancellationToken);
 
                     rCount = await _context.WorkAssignments.Where(x => x.Id == id).ExecuteDeleteAsync(cancellationToken);
 
@@ -115,7 +115,7 @@ namespace TaskTracker.Infrastructure.Repositories
 
         private IQueryable<WorkAssignment> GetInitQueryCollection(bool onlyHeadLevelObjects)
         {
-            return onlyHeadLevelObjects ? _context.WorkAssignments.Where(x => x.HeadAssignemtId == null) : _context.WorkAssignments;
+            return onlyHeadLevelObjects ? _context.WorkAssignments.Where(x => x.HeadAssignmentId == null) : _context.WorkAssignments;
         }
 
         private static IQueryable<WorkAssignment> WithRelationsIncludes(IQueryable<WorkAssignment> query)

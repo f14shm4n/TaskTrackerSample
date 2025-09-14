@@ -30,7 +30,7 @@ namespace TaskTracker.Infrastructure
 
                 x.HasOne(t => t.HeadAssignment)
                 .WithMany(t => t.SubAssignment)
-                .HasForeignKey(t => t.HeadAssignemtId)
+                .HasForeignKey(t => t.HeadAssignmentId)
                 .IsRequired(false);
 
                 x.ToTable("work_assignments");

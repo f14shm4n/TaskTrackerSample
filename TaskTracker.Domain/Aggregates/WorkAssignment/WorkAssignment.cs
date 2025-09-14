@@ -1,7 +1,9 @@
-﻿using TaskTracker.Domain.Abstractions;
+﻿using System.Diagnostics;
+using TaskTracker.Domain.Abstractions;
 
 namespace TaskTracker.Domain.Aggregates.WorkAssignment
 {
+    [DebuggerDisplay("[{Id}] (S: {Status}, P: {Priority}, RootId: {HeadAssignmentId})")]
     public class WorkAssignment : Entity, IAggregateRoot
     {
         private readonly List<WorkAssignment> _subAssignment = [];
@@ -26,7 +28,7 @@ namespace TaskTracker.Domain.Aggregates.WorkAssignment
         public WorkAssignmentPriority Priority { get; private set; }
         public string Author { get; private set; } = string.Empty; // Simplificated field
         public string? Worker { get; private set; } // Simplificated field
-        public int? HeadAssignemtId { get; private set; }
+        public int? HeadAssignmentId { get; private set; }
         public WorkAssignment? HeadAssignment { get; private set; }
         public IReadOnlyCollection<WorkAssignment> SubAssignment => _subAssignment;
         public IReadOnlyCollection<WorkAssignmentRelationship> OutRelations => _outRelations;
@@ -64,12 +66,12 @@ namespace TaskTracker.Domain.Aggregates.WorkAssignment
             {
                 return;
             }
-            HeadAssignemtId = headAssignmentId;
+            HeadAssignmentId = headAssignmentId;
         }
 
         public void RemoveHeadAssignment()
         {
-            HeadAssignemtId = null;
+            HeadAssignmentId = null;
         }
 
         public void AddOutRelation(WorkAssignmentRelationType relationType, int toWorkAssignmentId)
