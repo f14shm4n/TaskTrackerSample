@@ -1,12 +1,11 @@
 ﻿using MediatR;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using TaskTracker.API.Application.Dto;
 using TaskTracker.Domain.Aggregates.WorkAssignment;
 
 namespace TaskTracker.API.Application.Commands
 {
-    public class CreateWorkAssignmentCommand : IRequest<ApiResponseBase<WorkAssignmentDTO>>
+    public class CreateWorkAssignmentCommand : IRequest<ApiRequestResult>
     {
         /// <summary>
         /// Заголовок задачи.

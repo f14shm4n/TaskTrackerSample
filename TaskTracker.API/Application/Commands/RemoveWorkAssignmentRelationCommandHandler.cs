@@ -3,7 +3,7 @@ using TaskTracker.Domain.Aggregates.WorkAssignment;
 
 namespace TaskTracker.API.Application.Commands
 {
-    public class RemoveWorkAssignmentRelationCommandHandler : IRequestHandler<RemoveWorkAssignmentRelationCommand, ApiResponseBase>
+    public class RemoveWorkAssignmentRelationCommandHandler : IRequestHandler<RemoveWorkAssignmentRelationCommand, ApiRequestResult>
     {
         private readonly ILogger<RemoveWorkAssignmentRelationCommandHandler> _logger;
         private readonly IWorkAssignmentRepository _workRepository;
@@ -14,19 +14,19 @@ namespace TaskTracker.API.Application.Commands
             _workRepository = workAssignmentRepository;
         }
 
-        public async Task<ApiResponseBase> Handle(RemoveWorkAssignmentRelationCommand request, CancellationToken cancellationToken)
+        public async Task<ApiRequestResult> Handle(RemoveWorkAssignmentRelationCommand request, CancellationToken cancellationToken)
         {
             try
             {
                 // This check can be moved to Validation attribute to the command.
                 if (request.SourceId == request.TargetId)
                 {
-                    return new ApiResponseBase("The source task and target task are the same.", System.Net.HttpStatusCode.BadRequest);
+                    return ApiRequestResult.BadRequest("The source task and target task are the same.");
                 }
 
                 if (!await _workRepository.HasRelationAsync(request.Relation, request.SourceId, request.TargetId, cancellationToken))
                 {
-                    return new ApiResponseBase(true);
+                    return ApiRequestResult.Success();
                 }
 
                 var source = (await _workRepository.GetWithRelationsAsync(request.SourceId, cancellationToken))!;
@@ -37,14 +37,14 @@ namespace TaskTracker.API.Application.Commands
                 source.RemoveInRelation(request.Relation, request.TargetId);
 
                 await _workRepository.UnitOfWork.SaveChangesAsync(cancellationToken);
-                return new ApiResponseBase(true);
+                return ApiRequestResult.Success();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unable to remove relation between work assignment: SourceId: '{SID}', TargetId: '{TID}'", request.SourceId, request.TargetId);
             }
 
-            return new ApiResponseBase(false, System.Net.HttpStatusCode.InternalServerError);
+            return ApiRequestResult.InternalServerError();
         }
     }
 }

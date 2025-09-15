@@ -5,7 +5,7 @@ using TaskTracker.Domain.Aggregates.WorkAssignment;
 
 namespace TaskTracker.API.Application.Commands
 {
-    public class UpdateWorkAssignmentStatusCommand : IRequest<ApiResponseBase>
+    public class UpdateWorkAssignmentStatusCommand : IRequest<ApiRequestResult>
     {
         /// <summary>
         /// Идентификатор задачи.

@@ -4,7 +4,7 @@ using TaskTracker.API.Application.Dto;
 
 namespace TaskTracker.API.Application.Queries
 {
-    public class GetWorkAssignmentByIdQuery : IRequest<ApiResponseBase<WorkAssignmentDTO>>
+    public class GetWorkAssignmentByIdQuery : IRequest<ApiRequestResult>
     {
         /// <summary>
         /// Идентификатор задачи, которую нужно получить.

@@ -4,7 +4,7 @@ using TaskTracker.API.Application.Dto;
 
 namespace TaskTracker.API.Application.Queries
 {
-    public class GetWorkAssignmentListQuery : IRequest<ApiResponseBase<List<WorkAssignmentDTO>>>
+    public class GetWorkAssignmentListQuery : IRequest<ApiRequestResult>
     {
         /// <summary>
         /// Определяет, следует ли извлекать связанные данные задачи, такие как подзадачи, связи с другими задачами и тд.

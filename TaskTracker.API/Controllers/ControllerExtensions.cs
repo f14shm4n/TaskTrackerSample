@@ -6,16 +6,22 @@ namespace TaskTracker.API.Controllers
 {
     public static class ControllerExtensions
     {
-        public static ActionResult<T> ToActionResultResult<T>(this ControllerBase controller, T response) where T : ApiResponseBase
+        public static ActionResult ToActionResultResult(this ControllerBase controller, ApiRequestResult result)
         {
-            return response.StatusCode switch
+            ArgumentNullException.ThrowIfNull(result, $"{nameof(result)}");
+
+            switch (result.StatusCode)
             {
-                HttpStatusCode.OK => controller.Ok(response),
-                HttpStatusCode.BadRequest => controller.BadRequest(response),
-                HttpStatusCode.NotFound => controller.NotFound(response),
-                not null => controller.StatusCode((int)response.StatusCode, response),
-                _ => throw new InvalidOperationException("The HTTP status code must be set."),
-            };
+                case HttpStatusCode.OK:
+                    return controller.Ok(result.Value);
+                case var successCode when (int)successCode >= 201 && (int)successCode <= 399:
+                    return controller.StatusCode((int)successCode);
+                case var errorCode when (int)errorCode >= 400 && (int)errorCode <= 599:
+                    controller.HttpContext.Features.Set(result.Error);
+                    return controller.StatusCode((int)errorCode);
+                default:
+                    throw new NotImplementedException($"Unsupported HTTP status code. StatusCode: {result.StatusCode}");
+            }
         }
     }
 }

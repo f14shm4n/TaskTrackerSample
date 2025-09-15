@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using TaskTracker.API.Application.Jwt;
 using TaskTracker.API.Application.Services;
+using TaskTracker.API.Middlewares;
 using TaskTracker.Domain.Aggregates.WorkAssignment;
 using TaskTracker.Infrastructure;
 using TaskTracker.Infrastructure.Repositories;
@@ -22,10 +23,11 @@ namespace TaskTracker.API
             AddServices(builder);
 
             builder.Services
+                .AddProblemDetails()
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
+                .AddJwtBearer(o =>
                 {
-                    options.TokenValidationParameters = new TokenValidationParameters
+                    o.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
                         ValidateAudience = true,
@@ -40,9 +42,10 @@ namespace TaskTracker.API
             builder.Services
                 .AddAuthorization()
                 .AddControllers()
-                .AddJsonOptions(options =>
+                .AddJsonOptions(o =>
                 {
-                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                    o.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                    o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
 
             builder.Services.AddEndpointsApiExplorer();
@@ -85,6 +88,8 @@ namespace TaskTracker.API
 
             var app = builder.Build();
 
+            UseMiddlewares(app);
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -101,6 +106,8 @@ namespace TaskTracker.API
 
             app.Run();
         }
+
+        #region Utils
 
         private static void AddServices(WebApplicationBuilder builder)
         {
@@ -120,7 +127,13 @@ namespace TaskTracker.API
                     c.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
                 })
                 .AddScoped<IWorkAssignmentRepository, WorkAssignmentRepository>()
-                .AddScoped<IDataSeeder, DataSeeder>();
+                .AddScoped<IDataSeeder, DataSeeder>()
+                .AddTransient<ApiResponseProblemDetailMiddleware>();
+        }
+
+        private static void UseMiddlewares(WebApplication app)
+        {
+            app.UseMiddleware<ApiResponseProblemDetailMiddleware>();
         }
 
         private static void SetupDatabase(WebApplication app)
@@ -139,5 +152,7 @@ namespace TaskTracker.API
                 }
             }
         }
+
+        #endregion
     }
 }

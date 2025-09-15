@@ -5,7 +5,7 @@ using TaskTracker.Domain.Aggregates.WorkAssignment;
 
 namespace TaskTracker.API.Application.Queries
 {
-    public class GetWorkAssignmentByIdQueryHandler : IRequestHandler<GetWorkAssignmentByIdQuery, ApiResponseBase<WorkAssignmentDTO>>
+    public class GetWorkAssignmentByIdQueryHandler : IRequestHandler<GetWorkAssignmentByIdQuery, ApiRequestResult>
     {
         private readonly ILogger<GetWorkAssignmentByIdQueryHandler> _logger;
         private readonly IWorkAssignmentRepository _workRepository;
@@ -16,7 +16,7 @@ namespace TaskTracker.API.Application.Queries
             _workRepository = taskRepository;
         }
 
-        public async Task<ApiResponseBase<WorkAssignmentDTO>> Handle(GetWorkAssignmentByIdQuery request, CancellationToken cancellationToken)
+        public async Task<ApiRequestResult> Handle(GetWorkAssignmentByIdQuery request, CancellationToken cancellationToken)
         {
             try
             {
@@ -33,16 +33,16 @@ namespace TaskTracker.API.Application.Queries
 
                 if (entity is null)
                 {
-                    return new ApiResponseBase<WorkAssignmentDTO>("The task does not exists.", System.Net.HttpStatusCode.NotFound);
+                    return ApiRequestResult.Fail(System.Net.HttpStatusCode.NotFound, "The task does not exists.");
                 }
-                return new ApiResponseBase<WorkAssignmentDTO>(entity.ToWorkAssignmentDto());
+                return ApiRequestResult.Success(entity.ToWorkAssignmentDto());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unable to get work assignment by id. WorkAssignmentId: '{Id}'", request.Id);
             }
 
-            return new ApiResponseBase<WorkAssignmentDTO>(false, System.Net.HttpStatusCode.InternalServerError);
+            return ApiRequestResult.Fail(System.Net.HttpStatusCode.InternalServerError);
         }
     }
 }

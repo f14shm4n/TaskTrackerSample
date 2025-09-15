@@ -5,7 +5,7 @@ using TaskTracker.Infrastructure;
 
 namespace TaskTracker.API.Application.Commands
 {
-    public class UpdateWorkAssignmentAuthorCommand : IRequest<ApiResponseBase>
+    public class UpdateWorkAssignmentAuthorCommand : IRequest<ApiRequestResult>
     {
         /// <summary>
         /// Идентификатор задачи.

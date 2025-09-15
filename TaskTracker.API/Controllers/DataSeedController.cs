@@ -27,13 +27,14 @@ namespace TaskTracker.API.Controllers
         /// <param name="isConfirmed">Подтверждение действия.</param>
         /// <returns></returns>
         [HttpPost("fill")]
-        public async Task<ActionResult<ApiResponseBase>> FillDatabase([FromQuery] bool isConfirmed)
+        public async Task<ActionResult<ApiResponseValue>> FillDatabase([FromQuery] bool isConfirmed)
         {
             if (isConfirmed)
             {
                 return this.ToActionResultResult(await _dataSeeder.FillAsync());
             }
-            return StatusCode((int)HttpStatusCode.BadRequest, new ApiResponseBase($"Вы должны подтвердить действие. Параметр: [{nameof(isConfirmed)}] должен быть задан как 'true'", HttpStatusCode.BadRequest));
+            HttpContext.Features.Set(new ApiRequestErrorFeature($"Вы должны подтвердить действие. Параметр: [{nameof(isConfirmed)}] должен быть задан как 'true'"));
+            return BadRequest();
         }
 
         /// <summary>
@@ -42,13 +43,14 @@ namespace TaskTracker.API.Controllers
         /// <param name="isConfirmed">Подтверждение действия.</param>
         /// <returns></returns>
         [HttpPost("clear")]
-        public async Task<ActionResult<ApiResponseBase>> ClearDatabase([FromQuery] bool isConfirmed)
+        public async Task<ActionResult<ApiResponseValue>> ClearDatabase([FromQuery] bool isConfirmed)
         {
             if (isConfirmed)
             {
                 return this.ToActionResultResult(await _dataSeeder.ClearAsync());
             }
-            return StatusCode((int)HttpStatusCode.BadRequest, new ApiResponseBase($"Вы должны подтвердить действие. Параметр: [{nameof(isConfirmed)}] должен быть задан как 'true'", HttpStatusCode.BadRequest));
+            HttpContext.Features.Set(new ApiRequestErrorFeature($"Вы должны подтвердить действие. Параметр: [{nameof(isConfirmed)}] должен быть задан как 'true'"));
+            return BadRequest();
         }
     }
 }

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TaskTracker.API.Application.Commands
 {
-    public class AddSubWorkAssignmentCommand : IRequest<ApiResponseBase>
+    public class AddSubWorkAssignmentCommand : IRequest<ApiRequestResult>
     {
         /// <summary>
         /// Идентификатор задачи к которой необходимо прикрепить подзадачу.

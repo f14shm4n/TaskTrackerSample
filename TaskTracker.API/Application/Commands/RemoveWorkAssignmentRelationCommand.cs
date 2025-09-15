@@ -5,7 +5,7 @@ using TaskTracker.Domain.Aggregates.WorkAssignment;
 
 namespace TaskTracker.API.Application.Commands
 {
-    public class RemoveWorkAssignmentRelationCommand : IRequest<ApiResponseBase>
+    public class RemoveWorkAssignmentRelationCommand : IRequest<ApiRequestResult>
     {
         /// <summary>
         /// Тип связи между задачами.

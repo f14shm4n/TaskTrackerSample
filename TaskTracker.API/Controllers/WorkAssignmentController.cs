@@ -14,8 +14,8 @@ namespace TaskTracker.API.Controllers
     [ApiController]
     [Route(RootRoute)]
     [Produces("application/json")]
-    [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.Unauthorized)]
-    [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.InternalServerError)]
+    [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.InternalServerError)]
     public class WorkAssignmentController : ControllerBase
     {
         public const string RootRoute = "api/task";
@@ -36,8 +36,8 @@ namespace TaskTracker.API.Controllers
         /// <returns>Объект содержащий созданную задачу.</returns>
         /// <response code="200">Возвращается если задача создана.</response>
         [HttpPost]
-        [ProducesResponseType(typeof(ApiResponseBase<WorkAssignmentDTO>), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<ApiResponseBase<WorkAssignmentDTO>>> Create([FromBody] CreateWorkAssignmentCommand command)
+        [ProducesResponseType(typeof(ApiResponseValue<WorkAssignmentDTO>), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<ApiResponseValue<WorkAssignmentDTO>>> Create([FromBody] CreateWorkAssignmentCommand command)
         {
             return this.ToActionResultResult(await _mediator.Send(command));
         }
@@ -49,9 +49,9 @@ namespace TaskTracker.API.Controllers
         /// <response code="200">Возвращается если задача найдена</response>
         /// <response code="404">Возвращается если задача не найдена.</response>
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(ApiResponseBase<WorkAssignmentDTO>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ApiResponseBase<WorkAssignmentDTO>), (int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<ApiResponseBase<WorkAssignmentDTO>>> Get(GetWorkAssignmentByIdQuery query)
+        [ProducesResponseType(typeof(ApiResponseValue<WorkAssignmentDTO>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ApiResponseValue<WorkAssignmentDTO>>> Get(GetWorkAssignmentByIdQuery query)
         {
             return this.ToActionResultResult(await _mediator.Send(query));
         }
@@ -62,8 +62,8 @@ namespace TaskTracker.API.Controllers
         /// <param name="query"></param>
         /// <returns>Объект содержащий список с задачами.</returns>
         [HttpGet("list")]
-        [ProducesResponseType(typeof(ApiResponseBase<List<WorkAssignmentDTO>>), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<ApiResponseBase<List<WorkAssignmentDTO>>>> GetList(GetWorkAssignmentListQuery query)
+        [ProducesResponseType(typeof(ApiResponseValue<List<WorkAssignmentDTO>>), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<ApiResponseValue<List<WorkAssignmentDTO>>>> GetList(GetWorkAssignmentListQuery query)
         {
             return this.ToActionResultResult(await _mediator.Send(query));
         }
@@ -76,9 +76,9 @@ namespace TaskTracker.API.Controllers
         /// <response code="200">Возвращается если запрос выполнен без сбоев.</response>
         /// <response code="404">Возвращается если задача не найдена.</response>
         [HttpDelete("{id}")]
-        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<ApiResponseBase>> Delete(DeleteWorkAssignmentCommand command)
+        [ProducesResponseType(typeof(ApiResponseValue), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ApiResponseValue>> Delete(DeleteWorkAssignmentCommand command)
         {
             return this.ToActionResultResult(await _mediator.Send(command));
         }
@@ -91,9 +91,9 @@ namespace TaskTracker.API.Controllers
         /// <response code="200">Возвращается в случае успешного выполнения.</response>
         /// <response code="404">Возвращается если задача не найдена.</response>
         [HttpPut("{id}/status/{status}")]
-        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<ApiResponseBase>> UpdateStatus(UpdateWorkAssignmentStatusCommand command)
+        [ProducesResponseType(typeof(ApiResponseValue), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ApiResponseValue>> UpdateStatus(UpdateWorkAssignmentStatusCommand command)
         {
             return this.ToActionResultResult(await _mediator.Send(command));
         }
@@ -105,9 +105,9 @@ namespace TaskTracker.API.Controllers
         /// <response code="200">Возвращается в случае успешного выполнения.</response>
         /// <response code="404">Возвращается если задача не найдена.</response>
         [HttpPut("{id}/priority/{priority}")]
-        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<ApiResponseBase>> UpdatePriority(UpdateWorkAssignmentPriorityCommand command)
+        [ProducesResponseType(typeof(ApiResponseValue), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ApiResponseValue>> UpdatePriority(UpdateWorkAssignmentPriorityCommand command)
         {
             return this.ToActionResultResult(await _mediator.Send(command));
         }
@@ -120,9 +120,9 @@ namespace TaskTracker.API.Controllers
         /// <response code="200">Возвращается в случае успешного выполнения.</response>
         /// <response code="404">Возвращается если задача не найдена.</response>
         [HttpPut("{id}/author/{author}")]
-        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<ApiResponseBase>> UpdateAuthor(UpdateWorkAssignmentAuthorCommand command)
+        [ProducesResponseType(typeof(ApiResponseValue), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ApiResponseValue>> UpdateAuthor(UpdateWorkAssignmentAuthorCommand command)
         {
             return this.ToActionResultResult(await _mediator.Send(command));
         }
@@ -135,9 +135,9 @@ namespace TaskTracker.API.Controllers
         /// <response code="200">Возвращается в случае успешного выполнения.</response>
         /// <response code="404">Возвращается если задача не найдена.</response>
         [HttpPut("{id}/worker/{worker?}")]
-        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<ApiResponseBase>> UpdateWorker(UpdateWorkAssignmentWorkerCommand command)
+        [ProducesResponseType(typeof(ApiResponseValue), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ApiResponseValue>> UpdateWorker(UpdateWorkAssignmentWorkerCommand command)
         {
             return this.ToActionResultResult(await _mediator.Send(command));
         }
@@ -150,9 +150,9 @@ namespace TaskTracker.API.Controllers
         /// <response code="200">Возвращается в случае успешного выполнения.</response>
         /// <response code="404">Возвращается если задача не найдена.</response>
         [HttpPut("{id}/worker/unset")]
-        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<ApiResponseBase>> UnsetWorker(int id)
+        [ProducesResponseType(typeof(ApiResponseValue), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ApiResponseValue>> UnsetWorker(int id)
         {
             return this.ToActionResultResult(await _mediator.Send(new UpdateWorkAssignmentWorkerCommand() { Id = id }));
         }
@@ -166,10 +166,10 @@ namespace TaskTracker.API.Controllers
         /// <response code="400">Возвращается в случае, если данные запроса были некорректны. См. детали в объекте-результата запроса.</response>
         /// <response code="404">Возвращается если задача не найдена.</response>
         [HttpPut("{id}/nesting/{subTaskId}")]
-        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<ApiResponseBase>> AddNesting(AddSubWorkAssignmentCommand command)
+        [ProducesResponseType(typeof(ApiResponseValue), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ApiResponseValue>> AddNesting(AddSubWorkAssignmentCommand command)
         {
             return this.ToActionResultResult(await _mediator.Send(command));
         }
@@ -182,9 +182,9 @@ namespace TaskTracker.API.Controllers
         /// <response code="200">Возвращается в случае успешного выполнения.</response>
         /// <response code="404">Возвращается если задача не найдена.</response>
         [HttpPut("{id}/unnesting")]
-        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<ApiResponseBase>> RemoveNesting(ClearHeadWorkAssignmentCommand command)
+        [ProducesResponseType(typeof(ApiResponseValue), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ApiResponseValue>> RemoveNesting(ClearHeadWorkAssignmentCommand command)
         {
             return this.ToActionResultResult(await _mediator.Send(command));
         }
@@ -198,10 +198,10 @@ namespace TaskTracker.API.Controllers
         /// <response code="400">Возвращается в случае, если данные запроса были некорректны. См. детали в объекте-результата запроса.</response>
         /// <response code="404">Возвращается если задача не найдена.</response>
         [HttpPut("{sourceId}/relate/{targetId}/{relationType}")]
-        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.NotFound)]
-        public async Task<ActionResult<ApiResponseBase>> Relate(AddWorkAssignmentRelationCommand command)
+        [ProducesResponseType(typeof(ApiResponseValue), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.NotFound)]
+        public async Task<ActionResult<ApiResponseValue>> Relate(AddWorkAssignmentRelationCommand command)
         {
             return this.ToActionResultResult(await _mediator.Send(command));
         }
@@ -214,9 +214,9 @@ namespace TaskTracker.API.Controllers
         /// <response code="200">Возвращается в случае успешного выполнения.</response>
         /// <response code="400">Возвращается в случае, если данные запроса были некорректны. См. детали в объекте-результата запроса.</response>        
         [HttpPut("{sourceId}/unrelate/{targetId}/{relationType}")]
-        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(ApiResponseBase), (int)HttpStatusCode.BadRequest)]
-        public async Task<ActionResult<ApiResponseBase>> Unrelate(RemoveWorkAssignmentRelationCommand command)
+        [ProducesResponseType(typeof(ApiResponseValue), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.BadRequest)]
+        public async Task<ActionResult<ApiResponseValue>> Unrelate(RemoveWorkAssignmentRelationCommand command)
         {
             return this.ToActionResultResult(await _mediator.Send(command));
         }

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TaskTracker.API.Application.Commands
 {
-    public class ClearHeadWorkAssignmentCommand : IRequest<ApiResponseBase>
+    public class ClearHeadWorkAssignmentCommand : IRequest<ApiRequestResult>
     {
         /// <summary>
         /// Идентификатор подзадачи.

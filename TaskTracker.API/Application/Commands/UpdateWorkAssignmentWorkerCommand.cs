@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TaskTracker.API.Application.Commands
 {
-    public class UpdateWorkAssignmentWorkerCommand : IRequest<ApiResponseBase>
+    public class UpdateWorkAssignmentWorkerCommand : IRequest<ApiRequestResult>
     {
         /// <summary>
         /// Идентификатор задачи.

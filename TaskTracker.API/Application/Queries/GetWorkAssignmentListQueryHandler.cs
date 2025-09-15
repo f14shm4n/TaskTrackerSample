@@ -1,11 +1,10 @@
 ﻿using MediatR;
-using TaskTracker.API.Application.Dto;
 using TaskTracker.API.Application.Extensions;
 using TaskTracker.Domain.Aggregates.WorkAssignment;
 
 namespace TaskTracker.API.Application.Queries
 {
-    public class GetWorkAssignmentListQueryHandler : IRequestHandler<GetWorkAssignmentListQuery, ApiResponseBase<List<WorkAssignmentDTO>>>
+    public class GetWorkAssignmentListQueryHandler : IRequestHandler<GetWorkAssignmentListQuery, ApiRequestResult>
     {
         private readonly ILogger<GetWorkAssignmentListQueryHandler> _logger;
         private readonly IWorkAssignmentRepository _workRepository;
@@ -16,20 +15,20 @@ namespace TaskTracker.API.Application.Queries
             _workRepository = workRepository;
         }
 
-        public async Task<ApiResponseBase<List<WorkAssignmentDTO>>> Handle(GetWorkAssignmentListQuery request, CancellationToken cancellationToken)
+        public async Task<ApiRequestResult> Handle(GetWorkAssignmentListQuery request, CancellationToken cancellationToken)
         {
             try
             {
                 if (request.WithEmbedData)
                 {
-                    return new ApiResponseBase<List<WorkAssignmentDTO>>(
+                    return ApiRequestResult.Success(
                         (await _workRepository.GetCollectionFullIncludesAsync(request.Cursor, request.Limit, request.OnlyHeadTasks, cancellationToken))
                         .Select(x => x.ToWorkAssignmentDto())
                         .ToList());
                 }
                 else
                 {
-                    return new ApiResponseBase<List<WorkAssignmentDTO>>(
+                    return ApiRequestResult.Success(
                         (await _workRepository.GetCollectionAsync(request.Cursor, request.Limit, request.OnlyHeadTasks, cancellationToken))
                         .Select(x => x.ToWorkAssignmentDtoNoEmbed())
                         .ToList());
@@ -39,7 +38,7 @@ namespace TaskTracker.API.Application.Queries
             {
                 _logger.LogError(ex, "Unable to get work assignment list.");
             }
-            return new ApiResponseBase<List<WorkAssignmentDTO>>(false, System.Net.HttpStatusCode.InternalServerError);
+            return ApiRequestResult.Fail(System.Net.HttpStatusCode.InternalServerError);
         }
     }
 }

@@ -6,8 +6,8 @@ namespace TaskTracker.API.Application.Services
 {
     public interface IDataSeeder
     {
-        Task<ApiResponseBase> ClearAsync();
-        Task<ApiResponseBase> FillAsync();
+        Task<ApiRequestResult> ClearAsync();
+        Task<ApiRequestResult> FillAsync();
     }
 
     internal sealed class DataSeeder : IDataSeeder
@@ -21,11 +21,11 @@ namespace TaskTracker.API.Application.Services
             _context = context;
         }
 
-        public async Task<ApiResponseBase> FillAsync()
+        public async Task<ApiRequestResult> FillAsync()
         {
             if (await HasAnyData())
             {
-                return new ApiResponseBase("База данных уже содержит данные. Очистите базу данных и попробуйте снова.", System.Net.HttpStatusCode.BadRequest);
+                return ApiRequestResult.BadRequest("База данных уже содержит данные. Очистите базу данных и попробуйте снова.");
             }
 
             #region TestDataGen
@@ -145,23 +145,23 @@ namespace TaskTracker.API.Application.Services
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
 
-                    return new ApiResponseBase(true, System.Net.HttpStatusCode.OK);
+                    return ApiRequestResult.Success();
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Failed to commit sql transaction while seeding data.");
                     await transaction.RollbackAsync();
 
-                    return new ApiResponseBase("Failed to commit sql transaction while seeding data.", System.Net.HttpStatusCode.InternalServerError);
+                    return ApiRequestResult.InternalServerError("Failed to commit sql transaction while seeding data.");
                 }
             }
         }
 
-        public async Task<ApiResponseBase> ClearAsync()
+        public async Task<ApiRequestResult> ClearAsync()
         {
             if (!(await HasAnyData()))
             {
-                return new ApiResponseBase("База данных пуста.", System.Net.HttpStatusCode.BadRequest);
+                return ApiRequestResult.BadRequest("База данных пуста.");
             }
 
             await using (var transaction = await _context.Database.BeginTransactionAsync())
@@ -175,14 +175,14 @@ DELETE FROM {TaskTrackerDbContext.WorkAssignmentsTableName};
 DBCC CHECKIDENT ('{TaskTrackerDbContext.WorkAssignmentsTableName}', RESEED, 0)");
                     await transaction.CommitAsync();
 
-                    return new ApiResponseBase(true);
+                    return ApiRequestResult.Success();
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Failed to clear database.");
                     await transaction.RollbackAsync();
 
-                    return new ApiResponseBase("Failed to clear database.", System.Net.HttpStatusCode.InternalServerError);
+                    return ApiRequestResult.InternalServerError("Failed to clear database.");
                 }
             }
         }
