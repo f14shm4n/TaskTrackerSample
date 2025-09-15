@@ -1,5 +1,6 @@
 using FluentAssertions;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net;
 using System.Net.Http.Headers;
@@ -34,7 +35,7 @@ namespace TaskTracker.API.Tests
         {
             await DoWorkAsync(async (client, sp) =>
             {
-                var payload = (await PostAsJsonAsync<CreateWorkAssignmentCommand, ApiResponseBase<WorkAssignmentDTO>>(
+                var payload = (await PostAsJsonAsync<CreateWorkAssignmentCommand, ApiResponseValue<WorkAssignmentDTO>>(
                     client,
                     $"/{WorkAssignmentController.RootRoute}",
                     CreateTaskCreationCommand(),
@@ -56,9 +57,7 @@ namespace TaskTracker.API.Tests
             await DoWorkAsync(async (client, sp) =>
             {
                 var id = (await CreateTaskListAsync(1, sp.GetRequiredService<IMediator>())).First();
-                var rsp = await DeleteAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id}", HttpStatusCode.OK);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeTrue();
+                await DeleteAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{id}", HttpStatusCode.OK);
             });
         }
 
@@ -67,9 +66,7 @@ namespace TaskTracker.API.Tests
         {
             await DoWorkAsync(async (client, sp) =>
             {
-                var rsp = await DeleteAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}", HttpStatusCode.NotFound);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeFalse();
+                await DeleteAsync<ProblemDetails>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}", HttpStatusCode.NotFound);
             });
         }
 
@@ -87,9 +84,7 @@ namespace TaskTracker.API.Tests
 
                 try
                 {
-                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id}/status/{WorkAssignmentStatus.InProgress}", HttpStatusCode.OK);
-                    rsp.Should().NotBeNull();
-                    rsp.Success.Should().BeTrue();
+                    await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{id}/status/{WorkAssignmentStatus.InProgress}", HttpStatusCode.OK);
                 }
                 finally
                 {
@@ -103,9 +98,7 @@ namespace TaskTracker.API.Tests
         {
             await DoWorkAsync(async (client, sp) =>
             {
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}/status/{WorkAssignmentStatus.InProgress}", HttpStatusCode.NotFound);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeFalse();
+                await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}/status/{WorkAssignmentStatus.InProgress}", HttpStatusCode.NotFound);
             });
         }
 
@@ -123,9 +116,7 @@ namespace TaskTracker.API.Tests
 
                 try
                 {
-                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id}/priority/{WorkAssignmentPriority.Medium}", HttpStatusCode.OK);
-                    rsp.Should().NotBeNull();
-                    rsp.Success.Should().BeTrue();
+                    await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{id}/priority/{WorkAssignmentPriority.Medium}", HttpStatusCode.OK);
                 }
                 finally
                 {
@@ -139,9 +130,7 @@ namespace TaskTracker.API.Tests
         {
             await DoWorkAsync(async (client, sp) =>
             {
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}/priority/{WorkAssignmentPriority.Medium}", HttpStatusCode.NotFound);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeFalse();
+                await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}/priority/{WorkAssignmentPriority.Medium}", HttpStatusCode.NotFound);
             });
         }
 
@@ -159,9 +148,7 @@ namespace TaskTracker.API.Tests
 
                 try
                 {
-                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id}/author/Sergey", HttpStatusCode.OK);
-                    rsp.Should().NotBeNull();
-                    rsp.Success.Should().BeTrue();
+                    await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{id}/author/Sergey", HttpStatusCode.OK);
                 }
                 finally
                 {
@@ -175,9 +162,7 @@ namespace TaskTracker.API.Tests
         {
             await DoWorkAsync(async (client, sp) =>
             {
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}/author/Sergey", HttpStatusCode.NotFound);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeFalse();
+                await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}/author/Sergey", HttpStatusCode.NotFound);
             });
         }
 
@@ -194,13 +179,11 @@ namespace TaskTracker.API.Tests
             await DoWorkAsync(async (client, sp) =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
-                var id = (await mediator.Send(CreateTaskCreationCommand(worker: oldWorker))).Payload!.Id;
+                var id = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(worker: oldWorker))).Value!).Payload!.Id;
 
                 try
                 {
-                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id}/worker/{newWorker}", HttpStatusCode.OK);
-                    rsp.Should().NotBeNull();
-                    rsp.Success.Should().BeTrue();
+                    await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{id}/worker/{newWorker}", HttpStatusCode.OK);
                 }
                 finally
                 {
@@ -214,9 +197,7 @@ namespace TaskTracker.API.Tests
         {
             await DoWorkAsync(async (client, sp) =>
             {
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}/worker/Ivan", HttpStatusCode.NotFound);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeFalse();
+                await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}/worker/Ivan", HttpStatusCode.NotFound);
             });
         }
 
@@ -230,13 +211,11 @@ namespace TaskTracker.API.Tests
             await DoWorkAsync(async (client, sp) =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
-                var id = (await mediator.Send(CreateTaskCreationCommand(worker: "Vasya"))).Payload!.Id;
+                var id = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(worker: "Vasya"))).Value!).Payload!.Id;
 
                 try
                 {
-                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id}/worker/unset", HttpStatusCode.OK);
-                    rsp.Should().NotBeNull();
-                    rsp.Success.Should().BeTrue();
+                    await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{id}/worker/unset", HttpStatusCode.OK);
                 }
                 finally
                 {
@@ -250,9 +229,7 @@ namespace TaskTracker.API.Tests
         {
             await DoWorkAsync(async (client, sp) =>
             {
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}/worker/unset", HttpStatusCode.NotFound);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeFalse();
+                await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}/worker/unset", HttpStatusCode.NotFound);
             });
         }
 
@@ -266,14 +243,12 @@ namespace TaskTracker.API.Tests
             await DoWorkAsync(async (client, sp) =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
-                var id1 = (await mediator.Send(CreateTaskCreationCommand(title: "Master task #1"))).Payload!.Id;
-                var id2 = (await mediator.Send(CreateTaskCreationCommand(title: "Sub task #1-1"))).Payload!.Id;
+                var id1 = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: "Master task #1"))).Value!).Payload!.Id;
+                var id2 = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: "Sub task #1-1"))).Value!).Payload!.Id;
 
                 try
                 {
-                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/nesting/{id2}", HttpStatusCode.OK);
-                    rsp.Should().NotBeNull();
-                    rsp.Success.Should().BeTrue();
+                    await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/nesting/{id2}", HttpStatusCode.OK);
                 }
                 finally
                 {
@@ -288,16 +263,13 @@ namespace TaskTracker.API.Tests
             await DoWorkAsync(async (client, sp) =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
-                var id1 = (await mediator.Send(CreateTaskCreationCommand(title: "Master task #1"))).Payload!.Id;
-                var id2 = (await mediator.Send(CreateTaskCreationCommand(title: "Sub task #1-1"))).Payload!.Id;
+                var id1 = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: "Master task #1"))).Value!).Payload!.Id;
+                var id2 = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: "Sub task #1-1"))).Value!).Payload!.Id;
 
                 try
                 {
-                    await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/nesting/{id2}", HttpStatusCode.OK);
-                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/nesting/{id2}", HttpStatusCode.OK);
-                    rsp.Should().NotBeNull();
-                    rsp.Success.Should().BeTrue();
-
+                    await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/nesting/{id2}", HttpStatusCode.OK);
+                    await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/nesting/{id2}", HttpStatusCode.OK);
                 }
                 finally
                 {
@@ -311,9 +283,7 @@ namespace TaskTracker.API.Tests
         {
             await DoWorkAsync(async (client, sp) =>
             {
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}/nesting/{InvalidId}", HttpStatusCode.BadRequest);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeFalse();
+                await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}/nesting/{InvalidId}", HttpStatusCode.BadRequest);
             });
         }
 
@@ -322,9 +292,7 @@ namespace TaskTracker.API.Tests
         {
             await DoWorkAsync(async (client, sp) =>
             {
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}/nesting/1", HttpStatusCode.NotFound);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeFalse();
+                await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}/nesting/1", HttpStatusCode.NotFound);
             });
         }
 
@@ -334,13 +302,11 @@ namespace TaskTracker.API.Tests
             await DoWorkAsync(async (client, sp) =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
-                var id1 = (await mediator.Send(CreateTaskCreationCommand(title: "Master task #1"))).Payload!.Id;
+                var id1 = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: "Master task #1"))).Value!).Payload!.Id;
 
                 try
                 {
-                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/nesting/{InvalidId}", HttpStatusCode.NotFound);
-                    rsp.Should().NotBeNull();
-                    rsp.Success.Should().BeFalse();
+                    await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/nesting/{InvalidId}", HttpStatusCode.NotFound);
                 }
                 finally
                 {
@@ -359,15 +325,13 @@ namespace TaskTracker.API.Tests
             await DoWorkAsync(async (client, sp) =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
-                var id1 = (await mediator.Send(CreateTaskCreationCommand(title: "Master task #1"))).Payload!.Id;
-                var id2 = (await mediator.Send(CreateTaskCreationCommand(title: "Sub task #1-1"))).Payload!.Id;
+                var id1 = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: "Master task #1"))).Value!).Payload!.Id;
+                var id2 = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: "Sub task #1-1"))).Value!).Payload!.Id;
                 await mediator.Send(new AddSubWorkAssignmentCommand { WorkAssignmentId = id1, SubWorkAssignmentId = id2 });
 
                 try
                 {
-                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id2}/unnesting", HttpStatusCode.OK);
-                    rsp.Should().NotBeNull();
-                    rsp.Success.Should().BeTrue();
+                    await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{id2}/unnesting", HttpStatusCode.OK);
                 }
                 finally
                 {
@@ -381,9 +345,7 @@ namespace TaskTracker.API.Tests
         {
             await DoWorkAsync(async (client, sp) =>
             {
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}/unnesting", HttpStatusCode.NotFound);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeFalse();
+                await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}/unnesting", HttpStatusCode.NotFound);
             });
         }
 
@@ -397,14 +359,12 @@ namespace TaskTracker.API.Tests
             await DoWorkAsync(async (client, sp) =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
-                var id1 = (await mediator.Send(CreateTaskCreationCommand(title: "task #1"))).Payload!.Id;
-                var id2 = (await mediator.Send(CreateTaskCreationCommand(title: "task #1-1"))).Payload!.Id;
+                var id1 = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: "task #1"))).Value!).Payload!.Id;
+                var id2 = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: "task #1-1"))).Value!).Payload!.Id;
 
                 try
                 {
-                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/relate/{id2}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.OK);
-                    rsp.Should().NotBeNull();
-                    rsp.Success.Should().BeTrue();
+                    await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/relate/{id2}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.OK);
                 }
                 finally
                 {
@@ -419,15 +379,13 @@ namespace TaskTracker.API.Tests
             await DoWorkAsync(async (client, sp) =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
-                var id1 = (await mediator.Send(CreateTaskCreationCommand(title: "task #1"))).Payload!.Id;
-                var id2 = (await mediator.Send(CreateTaskCreationCommand(title: "task #1-1"))).Payload!.Id;
+                var id1 = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: "task #1"))).Value!).Payload!.Id;
+                var id2 = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: "task #1-1"))).Value!).Payload!.Id;
 
                 try
                 {
-                    await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/relate/{id2}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.OK);
-                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/relate/{id2}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.OK);
-                    rsp.Should().NotBeNull();
-                    rsp.Success.Should().BeTrue();
+                    await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/relate/{id2}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.OK);
+                    await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/relate/{id2}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.OK);
                 }
                 finally
                 {
@@ -441,9 +399,7 @@ namespace TaskTracker.API.Tests
         {
             await DoWorkAsync(async (client, sp) =>
             {
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}/relate/{InvalidId}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.BadRequest);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeFalse();
+                await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}/relate/{InvalidId}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.BadRequest);
             });
         }
 
@@ -452,9 +408,7 @@ namespace TaskTracker.API.Tests
         {
             await DoWorkAsync(async (client, sp) =>
             {
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}/relate/1/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.NotFound);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeFalse();
+                await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}/relate/1/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.NotFound);
             });
         }
 
@@ -464,13 +418,11 @@ namespace TaskTracker.API.Tests
             await DoWorkAsync(async (client, sp) =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
-                var id1 = (await mediator.Send(CreateTaskCreationCommand(title: "task #1"))).Payload!.Id;
+                var id1 = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: "task #1"))).Value!).Payload!.Id;
 
                 try
                 {
-                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/relate/{InvalidId}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.NotFound);
-                    rsp.Should().NotBeNull();
-                    rsp.Success.Should().BeFalse();
+                    await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/relate/{InvalidId}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.NotFound);
                 }
                 finally
                 {
@@ -489,15 +441,13 @@ namespace TaskTracker.API.Tests
             await DoWorkAsync(async (client, sp) =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
-                var id1 = (await mediator.Send(CreateTaskCreationCommand(title: "task #1"))).Payload!.Id;
-                var id2 = (await mediator.Send(CreateTaskCreationCommand(title: "task #1-1"))).Payload!.Id;
+                var id1 = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: "task #1"))).Value!).Payload!.Id;
+                var id2 = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: "task #1-1"))).Value!).Payload!.Id;
                 await mediator.Send(new AddWorkAssignmentRelationCommand { Relation = WorkAssignmentRelationType.RelativeTo, SourceId = id1, TargetId = id2 });
 
                 try
                 {
-                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/unrelate/{id2}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.OK);
-                    rsp.Should().NotBeNull();
-                    rsp.Success.Should().BeTrue();
+                    await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/unrelate/{id2}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.OK);
                 }
                 finally
                 {
@@ -512,14 +462,12 @@ namespace TaskTracker.API.Tests
             await DoWorkAsync(async (client, sp) =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
-                var id1 = (await mediator.Send(CreateTaskCreationCommand(title: "task #1"))).Payload!.Id;
-                var id2 = (await mediator.Send(CreateTaskCreationCommand(title: "task #1-1"))).Payload!.Id;
+                var id1 = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: "task #1"))).Value!).Payload!.Id;
+                var id2 = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: "task #1-1"))).Value!).Payload!.Id;
 
                 try
                 {
-                    var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/unrelate/{id2}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.OK);
-                    rsp.Should().NotBeNull();
-                    rsp.Success.Should().BeTrue();
+                    await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{id1}/unrelate/{id2}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.OK);
                 }
                 finally
                 {
@@ -533,9 +481,7 @@ namespace TaskTracker.API.Tests
         {
             await DoWorkAsync(async (client, sp) =>
             {
-                var rsp = await PutAsync<ApiResponseBase>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}/unrelate/{InvalidId}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.BadRequest);
-                rsp.Should().NotBeNull();
-                rsp.Success.Should().BeFalse();
+                await PutAsync<ApiResponseValue>(client, $"/{WorkAssignmentController.RootRoute}/{InvalidId}/unrelate/{InvalidId}/{WorkAssignmentRelationType.RelativeTo}", HttpStatusCode.BadRequest);
             });
         }
 
@@ -549,10 +495,10 @@ namespace TaskTracker.API.Tests
             await DoWorkAsync(async (client, sp) =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
-                var t1 = (await mediator.Send(CreateTaskCreationCommand(title: "Task #1"))).Payload!;
+                var t1 = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: "Task #1"))).Value!).Payload!;
                 try
                 {
-                    var dto = (await client.GetFromJsonAsync<ApiResponseBase<WorkAssignmentDTO>>($"/{WorkAssignmentController.RootRoute}/{t1.Id}", _jsonOptions))?.Payload!;
+                    var dto = (await client.GetFromJsonAsync<ApiResponseValue<WorkAssignmentDTO>>($"/{WorkAssignmentController.RootRoute}/{t1.Id}", _jsonOptions))?.Payload!;
                     dto.Title.Should().Be(t1.Title);
                     dto.SubAssignments.Should().BeNullOrEmpty();
                     dto.OutRelations.Should().BeNullOrEmpty();
@@ -571,15 +517,15 @@ namespace TaskTracker.API.Tests
             await DoWorkAsync(async (client, sp) =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
-                var t1 = (await mediator.Send(CreateTaskCreationCommand(title: "Task #1"))).Payload!;
-                var t2 = (await mediator.Send(CreateTaskCreationCommand(title: "Task #2"))).Payload!;
-                var t3 = (await mediator.Send(CreateTaskCreationCommand(title: "Sub Task #3"))).Payload!;
+                var t1 = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: "Task #1"))).Value!).Payload!;
+                var t2 = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: "Task #2"))).Value!).Payload!;
+                var t3 = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: "Sub Task #3"))).Value!).Payload!;
                 await mediator.Send(new AddWorkAssignmentRelationCommand { Relation = WorkAssignmentRelationType.RelativeTo, SourceId = t1.Id, TargetId = t2.Id });
                 await mediator.Send(new AddSubWorkAssignmentCommand { WorkAssignmentId = t1.Id, SubWorkAssignmentId = t3.Id });
 
                 try
                 {
-                    var taskDto = (await client.GetFromJsonAsync<ApiResponseBase<WorkAssignmentDTO>>($"/{WorkAssignmentController.RootRoute}/{t1.Id}?embed=true", _jsonOptions))?.Payload!;
+                    var taskDto = (await client.GetFromJsonAsync<ApiResponseValue<WorkAssignmentDTO>>($"/{WorkAssignmentController.RootRoute}/{t1.Id}?embed=true", _jsonOptions))?.Payload!;
                     taskDto.Title.Should().Be(t1.Title);
                     taskDto.SubAssignments.Should().NotBeNullOrEmpty();
                     taskDto.OutRelations.Should().NotBeNullOrEmpty();
@@ -602,14 +548,14 @@ namespace TaskTracker.API.Tests
             await DoWorkAsync(async (client, sp) =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
-                var t1 = (await mediator.Send(CreateTaskCreationCommand(title: "Task #1"))).Payload!;
-                var t2 = (await mediator.Send(CreateTaskCreationCommand(title: "Sub Task #1-1"))).Payload!;
+                var t1 = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: "Task #1"))).Value!).Payload!;
+                var t2 = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: "Sub Task #1-1"))).Value!).Payload!;
                 await mediator.Send(new AddWorkAssignmentRelationCommand { Relation = WorkAssignmentRelationType.RelativeTo, SourceId = t1.Id, TargetId = t2.Id });
                 await mediator.Send(new AddSubWorkAssignmentCommand { WorkAssignmentId = t1.Id, SubWorkAssignmentId = t2.Id });
 
                 try
                 {
-                    var data = await client.GetFromJsonAsync<ApiResponseBase<List<WorkAssignmentDTO>>>($"/{WorkAssignmentController.RootRoute}/list?embed=true&cursor={t1.Id - 1}&limit=2", _jsonOptions);
+                    var data = await client.GetFromJsonAsync<ApiResponseValue<List<WorkAssignmentDTO>>>($"/{WorkAssignmentController.RootRoute}/list?embed=true&cursor={t1.Id - 1}&limit=2", _jsonOptions);
                     data.Should().NotBeNull();
                     data.Payload.Should().HaveCount(2);
                     data.Payload.ForEach(x =>
@@ -643,13 +589,13 @@ namespace TaskTracker.API.Tests
             await DoWorkAsync(async (client, sp) =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
-                var t1 = (await mediator.Send(CreateTaskCreationCommand(title: "Task #1"))).Payload!;
-                var t2 = (await mediator.Send(CreateTaskCreationCommand(title: "Sub Task #1-1"))).Payload!;
+                var t1 = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: "Task #1"))).Value!).Payload!;
+                var t2 = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: "Sub Task #1-1"))).Value!).Payload!;
                 await mediator.Send(new AddSubWorkAssignmentCommand { WorkAssignmentId = t1.Id, SubWorkAssignmentId = t2.Id });
 
                 try
                 {
-                    var data = await client.GetFromJsonAsync<ApiResponseBase<List<WorkAssignmentDTO>>>($"/{WorkAssignmentController.RootRoute}/list?embed=false", _jsonOptions);
+                    var data = await client.GetFromJsonAsync<ApiResponseValue<List<WorkAssignmentDTO>>>($"/{WorkAssignmentController.RootRoute}/list?embed=false", _jsonOptions);
                     data.Should().NotBeNull();
                     data.Payload.Should().HaveCountGreaterThanOrEqualTo(2);
                     data.Payload.ForEach(x =>
@@ -673,13 +619,13 @@ namespace TaskTracker.API.Tests
             await DoWorkAsync(async (client, sp) =>
             {
                 var mediator = sp.GetRequiredService<IMediator>();
-                var t1 = (await mediator.Send(CreateTaskCreationCommand(title: "Task #1"))).Payload!;
-                var t2 = (await mediator.Send(CreateTaskCreationCommand(title: "Sub Task #1-1"))).Payload!;
+                var t1 = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: "Task #1"))).Value!).Payload!;
+                var t2 = ((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: "Sub Task #1-1"))).Value!).Payload!;
                 await mediator.Send(new AddSubWorkAssignmentCommand { WorkAssignmentId = t1.Id, SubWorkAssignmentId = t2.Id });
 
                 try
                 {
-                    var data = await client.GetFromJsonAsync<ApiResponseBase<List<WorkAssignmentDTO>>>($"/{WorkAssignmentController.RootRoute}/list?onlyRoot=true", _jsonOptions);
+                    var data = await client.GetFromJsonAsync<ApiResponseValue<List<WorkAssignmentDTO>>>($"/{WorkAssignmentController.RootRoute}/list?onlyRoot=true", _jsonOptions);
                     data.Should().NotBeNull();
                     data.Payload.Should().HaveCountGreaterThanOrEqualTo(1);
                     data.Payload.Should().OnlyContain(x => x.HeadAssignmentId == null);
@@ -764,7 +710,7 @@ namespace TaskTracker.API.Tests
             var taskIds = new List<int>();
             for (var i = 0; i < count; i++)
             {
-                taskIds.Add((await mediator.Send(CreateTaskCreationCommand(title: $"Task #{i + 1}"))).Payload!.Id);
+                taskIds.Add(((ApiResponseValue<WorkAssignmentDTO>)(await mediator.Send(CreateTaskCreationCommand(title: $"Task #{i + 1}"))).Value!).Payload!.Id);
             }
             return taskIds;
         }
