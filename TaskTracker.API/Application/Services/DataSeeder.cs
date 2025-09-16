@@ -149,7 +149,9 @@ namespace TaskTracker.API.Application.Services
                 }
                 catch (Exception ex)
                 {
+#pragma warning disable CA1848 // Использовать делегаты LoggerMessage
                     _logger.LogError(ex, "Failed to commit sql transaction while seeding data.");
+#pragma warning restore CA1848 // Использовать делегаты LoggerMessage
                     await transaction.RollbackAsync();
 
                     return ApiRequestResult.InternalServerError("Failed to commit sql transaction while seeding data.");
@@ -179,7 +181,9 @@ DBCC CHECKIDENT ('{TaskTrackerDbContext.WorkAssignmentsTableName}', RESEED, 0)")
                 }
                 catch (Exception ex)
                 {
+#pragma warning disable CA1848 // Использовать делегаты LoggerMessage
                     _logger.LogError(ex, "Failed to clear database.");
+#pragma warning restore CA1848 // Использовать делегаты LoggerMessage
                     await transaction.RollbackAsync();
 
                     return ApiRequestResult.InternalServerError("Failed to clear database.");

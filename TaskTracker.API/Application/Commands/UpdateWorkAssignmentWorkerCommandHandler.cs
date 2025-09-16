@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using TaskTracker.API.Application.Extensions;
 using TaskTracker.Domain.Aggregates.WorkAssignment;
 
 namespace TaskTracker.API.Application.Commands
@@ -39,11 +40,11 @@ namespace TaskTracker.API.Application.Commands
             {
                 if (request.Worker is null || request.Worker.Length == 0)
                 {
-                    _logger.LogError(ex, "Unable to recall work assignment worker. WorkAssignmentId: '{Id}'", request.Id);
+                    _logger.LogUnableToRecallWorkAssignmentWorker(request.Id, ex);
                 }
                 else
                 {
-                    _logger.LogError(ex, "Unable to update work assignment worker. WorkAssignmentId: '{Id}', NewWorker: '{Worker}'", request.Id, request.Worker);
+                    _logger.LogUnableToUpdateWorkAssignmentWorker(request.Id, request.Worker, ex);
                 }
             }
             return ApiRequestResult.InternalServerError();

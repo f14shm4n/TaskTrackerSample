@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using TaskTracker.API.Application.Extensions;
 using TaskTracker.Domain.Aggregates.WorkAssignment;
 
 namespace TaskTracker.API.Application.Commands
@@ -27,7 +28,7 @@ namespace TaskTracker.API.Application.Commands
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unable to delete work assignment. WorkAssignmentId: '{Id}'.", request.Id);
+                _logger.LogUnableToDeleteWorkAssignment(request.Id, ex);
             }
             return ApiRequestResult.InternalServerError();
         }

@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using TaskTracker.API.Application.Extensions;
 using TaskTracker.Domain.Aggregates.WorkAssignment;
 
 namespace TaskTracker.API.Application.Commands
@@ -50,7 +51,7 @@ namespace TaskTracker.API.Application.Commands
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unable to create relation between work assignment: SourceId: '{SID}', TargetId: '{TID}'", request.SourceId, request.TargetId);
+                _logger.LogUnableToCreateWorkAssignmentRelation(request.SourceId, request.TargetId, ex);
             }
             return ApiRequestResult.InternalServerError();
         }

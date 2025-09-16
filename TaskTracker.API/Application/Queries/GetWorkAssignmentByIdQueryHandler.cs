@@ -39,7 +39,7 @@ namespace TaskTracker.API.Application.Queries
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unable to get work assignment by id. WorkAssignmentId: '{Id}'", request.Id);
+                _logger.LogUnableToGetWorkAssignmentById(request.Id, ex);
             }
 
             return ApiRequestResult.Fail(System.Net.HttpStatusCode.InternalServerError);

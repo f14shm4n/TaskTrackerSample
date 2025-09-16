@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using TaskTracker.API.Application.Extensions;
 using TaskTracker.Domain.Aggregates.WorkAssignment;
 
 namespace TaskTracker.API.Application.Commands
@@ -46,7 +47,7 @@ namespace TaskTracker.API.Application.Commands
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unable to add sub work Assignment. WorkAssignmentId: '{HID}', SubWorkAssignmentId: '{SID}'", request.WorkAssignmentId, request.SubWorkAssignmentId);
+                _logger.LogUnableToAddWorkAssignmentNesting(request.WorkAssignmentId, request.SubWorkAssignmentId, ex);
             }
             return ApiRequestResult.InternalServerError();
         }

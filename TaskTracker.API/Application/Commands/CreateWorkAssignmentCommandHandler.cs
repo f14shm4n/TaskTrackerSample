@@ -26,7 +26,7 @@ namespace TaskTracker.API.Application.Commands
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unable to add new work assignment to the data base.");
+                _logger.LogUnableToCreateWorkAssignment(ex);
             }
             return ApiRequestResult.InternalServerError();
         }

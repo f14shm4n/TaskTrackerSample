@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using TaskTracker.API.Application.Extensions;
 using TaskTracker.Domain.Aggregates.WorkAssignment;
 
 namespace TaskTracker.API.Application.Commands
@@ -30,7 +31,7 @@ namespace TaskTracker.API.Application.Commands
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unable to update work assignment status. WorkAssignmentId: '{Id}' and NewStatus: '{Status}'", request.Id, request.Status);
+                _logger.LogUnableToUpdateWorkAssignmentStatus(request.Id, request.Status, ex);
             }
             return ApiRequestResult.InternalServerError();
         }

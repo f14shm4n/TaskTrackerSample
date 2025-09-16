@@ -61,11 +61,13 @@ namespace TaskTracker.API.Migrations
                 table: "work_assignments",
                 column: "HeadAssignemtId");
 
+#pragma warning disable CA1861 // Избегайте использования константных массивов в качестве аргументов
             migrationBuilder.CreateIndex(
                 name: "IX_work_assignments_relationships_Relation_SourceWorkAssignmentId_TargetWorkAssignmentId",
                 table: "work_assignments_relationships",
                 columns: new[] { "Relation", "SourceWorkAssignmentId", "TargetWorkAssignmentId" },
                 unique: true);
+#pragma warning restore CA1861 // Избегайте использования константных массивов в качестве аргументов
 
             migrationBuilder.CreateIndex(
                 name: "IX_work_assignments_relationships_SourceWorkAssignmentId",

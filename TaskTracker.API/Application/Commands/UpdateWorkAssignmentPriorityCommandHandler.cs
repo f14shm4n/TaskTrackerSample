@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using TaskTracker.API.Application.Extensions;
 using TaskTracker.Domain.Aggregates.WorkAssignment;
 
 namespace TaskTracker.API.Application.Commands
@@ -30,7 +31,7 @@ namespace TaskTracker.API.Application.Commands
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unable to update work assignment priority. WorkAssignmentId: '{Id}' and NewPriority: '{Status}'", request.Id, request.Priority);
+                _logger.LogUnableToUpdateWorkAssignmentPriority(request.Id, request.Priority, ex);
             }
             return ApiRequestResult.InternalServerError();
         }

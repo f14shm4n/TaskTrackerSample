@@ -22,9 +22,9 @@ namespace TaskTracker.Infrastructure
         public DbSet<WorkAssignment> WorkAssignments { get; set; }
         public DbSet<WorkAssignmentRelationship> WorkAssignmentRelationships { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            builder.Entity<WorkAssignment>(x =>
+            modelBuilder.Entity<WorkAssignment>(x =>
             {
                 x.HasKey(x => x.Id);
 
@@ -40,7 +40,7 @@ namespace TaskTracker.Infrastructure
                 x.ToTable(WorkAssignmentsTableName);
             });
 
-            builder.Entity<WorkAssignmentRelationship>(x =>
+            modelBuilder.Entity<WorkAssignmentRelationship>(x =>
             {
                 x.HasKey(x => new { x.Relation, x.SourceWorkAssignmentId, x.TargetWorkAssignmentId });
 

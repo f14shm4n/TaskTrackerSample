@@ -148,7 +148,9 @@ namespace TaskTracker.API
                 }
                 catch (Exception ex)
                 {
+#pragma warning disable CA1848 // Использовать делегаты LoggerMessage
                     logger.LogError(ex, "Failed to create database or apply migrations.");
+#pragma warning restore CA1848 // Использовать делегаты LoggerMessage
                 }
             }
         }

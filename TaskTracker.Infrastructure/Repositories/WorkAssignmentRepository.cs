@@ -1,12 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TaskTracker.Domain.Abstractions;
 using TaskTracker.Domain.Aggregates.WorkAssignment;
+using TaskTracker.Infrastructure.Extensions;
 
 namespace TaskTracker.Infrastructure.Repositories
 {
@@ -49,7 +45,7 @@ namespace TaskTracker.Infrastructure.Repositories
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Unable to commit transaction while deleting work assignment. WorkAssignmentId: '{ID}'", id);
+                    _logger.LogUnableToCommitTransactionOnDeleingWorkAssignment(id, ex);
                     await transaction.RollbackAsync(cancellationToken);
                     throw;
                 }
